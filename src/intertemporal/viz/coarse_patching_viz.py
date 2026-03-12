@@ -20,14 +20,16 @@ from ...activation_patching.coarse import (
     CoarseActPatchAggregatedResults,
     CoarseActPatchResults,
 )
+from ...common import profile
 from ...common.contrastive_pair import ContrastivePair
 from ...viz.token_coloring import PairTokenColoring
-from .coarse.aggregated import plot_aggregated
+from .coarse.aggregated import plot_aggregated_structured
 from .coarse.comparison import plot_comparison
 from .coarse.sanity import plot_sanity_check
 from .coarse.sweep_plots import plot_layer_sweep, plot_position_sweep
 
 
+@profile
 def visualize_coarse_patching(
     result: CoarseActPatchResults | CoarseActPatchAggregatedResults | None,
     output_dir: Path,
@@ -57,7 +59,7 @@ def visualize_coarse_patching(
 
     # Handle aggregated results
     if isinstance(result, CoarseActPatchAggregatedResults):
-        plot_aggregated(result, output_dir, coloring)
+        plot_aggregated_structured(result, output_dir)
         return
 
     output_dir = Path(output_dir)
@@ -77,8 +79,9 @@ def visualize_coarse_patching(
             plot_position_sweep(pos_data, output_dir, step_size, "short", coloring)
             plot_position_sweep(pos_data, output_dir, step_size, "long", coloring)
 
-    # Denoising vs Noising comparison plots
-    for step_size in result.layer_step_sizes:
+    # Denoising vs Noising comparison plots (for all step sizes)
+    all_step_sizes = set(result.layer_step_sizes) | set(result.position_step_sizes)
+    for step_size in sorted(all_step_sizes):
         layer_data = result.get_layer_results_for_step(step_size)
         pos_data = result.get_position_results_for_step(step_size)
         if layer_data or pos_data:
