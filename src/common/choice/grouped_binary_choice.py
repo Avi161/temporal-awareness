@@ -110,6 +110,10 @@ class GroupedBinaryChoice(SimpleBinaryChoice):
             fork_arms=[(0, 1)],
         )
 
+        # Analyze the subtree (populates fork.analysis)
+        from ..analysis import analyze_token_tree
+        analyze_token_tree(subtree)
+
         # Get labels for this fork
         labels = None
         if self.label_pairs and fork_idx < len(self.label_pairs):
