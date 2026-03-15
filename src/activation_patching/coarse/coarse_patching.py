@@ -34,10 +34,10 @@ def run_coarse_act_patching(
     Returns:
         CoarseActPatchResults with results organized by step size
     """
-    # Defaults
-    if layer_step_sizes is None:
+    # Defaults (apply if None or empty)
+    if not layer_step_sizes:
         layer_step_sizes = [1]
-    if pos_step_sizes is None:
+    if not pos_step_sizes:
         pos_step_sizes = [1]
 
     pair.print_position_mapping_debug("[coarse]")
