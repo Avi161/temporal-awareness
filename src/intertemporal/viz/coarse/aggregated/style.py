@@ -35,12 +35,13 @@ AXIS_LABEL_FONTSIZE = 9
 TICK_LABEL_FONTSIZE = 8
 
 # Column definitions: column_name -> list of metric field names
+# Uses computed properties (effect, effect_reciprocal_rank) that are mode-aware
 COLUMN_METRICS = {
     "core": [
-        "recovery",
-        "logit_diff",
-        "norm_logit_diff",
-        "reciprocal_rank_short",
+        "effect",  # recovery for denoising, disruption for noising
+        "effect_logit_diff",  # target - source semantics
+        "effect_norm_logit_diff",  # normalized version
+        "effect_reciprocal_rank",  # rank of target option
     ],
     "probs": [
         "prob_short",
@@ -53,7 +54,7 @@ COLUMN_METRICS = {
         "logit_long",
         "norm_logit_short",
         "norm_logit_long",
-        "rel_logit_delta",
+        "effect_rel_logit_delta",
     ],
     "fork": [
         "fork_entropy",
@@ -70,15 +71,26 @@ COLUMN_METRICS = {
         "traj_inv_perplexity_long",
         "vocab_tcb",
     ],
+    # Combined multilabel metrics (only populated for "combined" perspective)
+    "combined": [
+        "combined_logit_diff",
+        "combined_prob_short",
+        "combined_prob_long",
+    ],
 }
 
 # Display names for metrics
 METRIC_DISPLAY_NAMES = {
+    "effect": "Effect",  # Mode-aware: recovery or disruption
+    "effect_logit_diff": "Logit Diff",  # Mode-aware
+    "effect_norm_logit_diff": "Norm Logit Diff",  # Mode-aware
+    "effect_reciprocal_rank": "RR (Target)",  # Mode-aware: rank of target option
     "recovery": "Recovery",
     "disruption": "Disruption",
     "logit_diff": "Logit Diff",
     "norm_logit_diff": "Norm Logit Diff",
     "reciprocal_rank_short": "RR (Short)",
+    "reciprocal_rank_long": "RR (Long)",
     "prob_short": "P(Short)",
     "prob_long": "P(Long)",
     "logprob_short": "LogP(Short)",
@@ -88,6 +100,7 @@ METRIC_DISPLAY_NAMES = {
     "norm_logit_short": "Norm Logit Short",
     "norm_logit_long": "Norm Logit Long",
     "rel_logit_delta": "Rel Logit Delta",
+    "effect_rel_logit_delta": "Rel Logit Delta",  # Mode-aware
     "fork_entropy": "Fork Entropy",
     "fork_diversity": "Fork Diversity",
     "fork_simpson": "Fork Simpson",
@@ -97,14 +110,31 @@ METRIC_DISPLAY_NAMES = {
     "traj_inv_perplexity_short": "Inv Perp (Short)",
     "traj_inv_perplexity_long": "Inv Perp (Long)",
     "vocab_tcb": "Vocab TCB",
+    # Combined multilabel metrics
+    "combined_logit_diff": "Combined Logit Diff",
+    "combined_prob_short": "Combined P(Short)",
+    "combined_prob_long": "Combined P(Long)",
+    "combined_logit_short": "Combined Logit Short",
+    "combined_logit_long": "Combined Logit Long",
 }
 
 # Map metric field names to color keys
 METRIC_TO_COLOR_KEY = {
+    "effect": "recovery",  # Use recovery color for effect
+    "effect_logit_diff": "logit_diff",  # Use logit_diff color
+    "effect_norm_logit_diff": "norm_logit_diff",  # Use norm_logit_diff color
+    "effect_rel_logit_delta": "rel_logit_delta",  # Use rel_logit_delta color
+    "effect_reciprocal_rank": "rr_short",  # Use rr_short color
     "reciprocal_rank_short": "rr_short",
     "reciprocal_rank_long": "rr_long",
     "traj_inv_perplexity_short": "inv_perplexity_short",
     "traj_inv_perplexity_long": "inv_perplexity_long",
+    # Combined multilabel metrics
+    "combined_logit_diff": "logit_diff",
+    "combined_prob_short": "prob_short",
+    "combined_prob_long": "prob_long",
+    "combined_logit_short": "logit_short",
+    "combined_logit_long": "logit_long",
 }
 
 

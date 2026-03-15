@@ -115,7 +115,7 @@ def _plot_greedy_results(
                 "NOISING (clean->corrupt):",
                 f"  Original greedy: '{orig_label}'  {flip_marker}",
                 f"  After patch:     '{intv_label}'",
-                f"  Recovery: {n.recovery:.4f}",
+                f"  Disruption: {n.disruption:.4f}",
             ]
         )
         if orig_response:
@@ -179,7 +179,7 @@ def _plot_probability_bars(
         ax.axis("off")
         return
 
-    metrics_names = ["prob(short)", "prob(long)", "fork_div", "recovery"]
+    metrics_names = ["prob(short)", "prob(long)", "fork_div", "recov/disrupt"]
     x = np.arange(len(metrics_names))
     width = 0.35
 
@@ -198,7 +198,7 @@ def _plot_probability_bars(
             n_metrics.prob_short,
             n_metrics.prob_long,
             n_metrics.fork_diversity,
-            n_metrics.recovery,
+            n_metrics.disruption,
         ]
         if n_metrics
         else [0, 0, 0, 0]

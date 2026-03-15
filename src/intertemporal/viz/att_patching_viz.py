@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from ...attribution_patching import AttributionSummary
+from ...common import profile
 from ...viz.patching_heatmaps import (
     PatchingHeatmapConfig,
     plot_multi_metric_heatmap,
@@ -12,6 +13,7 @@ from ...viz.patching_heatmaps import (
 )
 
 
+@profile
 def visualize_att_patching(
     result: AttributionSummary | None,
     output_dir: Path,

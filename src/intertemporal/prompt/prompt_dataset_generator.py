@@ -11,7 +11,6 @@ Generates prompt datasets from config files with support for:
 from __future__ import annotations
 
 import math
-import random
 import re
 from typing import Optional
 from itertools import product
@@ -241,12 +240,15 @@ class PromptDatasetGenerator:
             prompt = prompt.replace(f"[{key}]", value)
 
         # Validate no unreplaced placeholders remain
-        self._validate_no_unreplaced_placeholders(prompt, "question_template")
+        # Exclude the labels from placeholder detection
+        self._validate_no_unreplaced_placeholders(
+            prompt, "question_template", exclude_strings=list(labels)
+        )
 
         return prompt
 
     def _validate_no_unreplaced_placeholders(
-        self, text: str, context: str = ""
+        self, text: str, context: str = "", exclude_strings: list[str] | None = None
     ) -> None:
         """
         Validate that no [PLACEHOLDER] patterns remain in text.
@@ -254,17 +256,22 @@ class PromptDatasetGenerator:
         Args:
             text: Text to check
             context: Description of where this text came from (for error messages)
+            exclude_strings: Strings to exclude from placeholder detection (e.g., labels)
 
         Raises:
             ValueError: If unreplaced placeholders are found
         """
+        exclude_set = set(exclude_strings) if exclude_strings else set()
+
         # Find [WORD] patterns that look like placeholders:
         # - Must contain underscore OR be longer than 2 chars
         # - This excludes labels like [A], [B], [1], [2] which are intentional
         all_brackets = re.findall(r"\[[A-Z][A-Z0-9_]*\]", text)
         placeholders = [
-            p for p in all_brackets if "_" in p or len(p) > 4
-        ]  # [XX] = 4 chars
+            p
+            for p in all_brackets
+            if (("_" in p or len(p) > 4) and p not in exclude_set)
+        ]
         if placeholders:
             unique = sorted(set(placeholders))
             ctx = f" in {context}" if context else ""
@@ -278,14 +285,23 @@ class PromptDatasetGenerator:
         default_var.labels = self.dataset_config.context.labels
         return default_var
 
+    def do_formatting_grid(self):
+        return (
+            self.dataset_config.do_variation_grid
+            or self.dataset_config.do_variation_grid
+        )
+
+    def do_random_formatting(self):
+        if self.do_formatting_grid():
+            return False
+        if not self.dataset_config.add_formatting_noise:
+            return False
+        return True
+
     def _process_formatting_variation(
         self, variation: Optional[FormattingVariation]
     ) -> FormattingVariation:
-        need_to_reformat = (
-            self.dataset_config.add_formatting_variations
-            and not self.dataset_config.do_variation_grid
-        )
-        if need_to_reformat:
+        if self.do_random_formatting():
             return FormattingVariation.random()
         if not variation:
             return self.get_default_formatting()
@@ -319,9 +335,8 @@ class PromptDatasetGenerator:
         variation = self._process_formatting_variation(variation)
         labels = variation.labels
 
-        short_on_left = True
-        if variation.flip_order:
-            short_on_left = random.choice([True, False])
+        # Deterministic flip: flip_order=True means long-term option goes first
+        short_on_left = not variation.flip_order
         if short_on_left:
             left_label, right_label = labels[0], labels[1]
             short_term_label, long_term_label = left_label, right_label
@@ -398,8 +413,10 @@ class PromptDatasetGenerator:
         )
 
     def generate_formatting_variation_grid(self):
+        if self.dataset_config.do_full_variation_grid:
+            return FormattingVariation.get_full_grid()
         if self.dataset_config.do_variation_grid:
-            return FormattingVariation.get_grid()
+            return FormattingVariation.get_simple_grid()
         return [self.get_default_formatting()]
 
     def generate_grid(self):

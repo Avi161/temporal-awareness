@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from ...common import profile
 from ...common.device_utils import clear_gpu_memory
 from ...binary_choice import BinaryChoiceRunner
 from ...common.contrastive_pair import ContrastivePair
@@ -9,15 +10,13 @@ from .coarse_results import CoarseActPatchResults
 from .sweep_runners import run_sanity_check, run_layer_sweep, run_position_sweep
 
 
-DEBUG_TOGGLE = False
-
-
+@profile
 def run_coarse_act_patching(
     runner: BinaryChoiceRunner,
     pair: ContrastivePair,
     component: str = "resid_post",
-    min_layer_depth: float = 0.01,
-    max_layer_depth: float = 0.99,
+    min_layer_depth: float = 0.001,
+    max_layer_depth: float = 0.999,
     layer_step_sizes: list[int] | None = None,
     pos_step_sizes: list[int] | None = None,
 ) -> CoarseActPatchResults:
@@ -35,14 +34,11 @@ def run_coarse_act_patching(
     Returns:
         CoarseActPatchResults with results organized by step size
     """
+    # Defaults
     if layer_step_sizes is None:
-        layer_step_sizes = [1, 3, 9, 16]
-    if pos_step_sizes is None:
-        pos_step_sizes = [1, 3, 9, 16]
-
-    if DEBUG_TOGGLE:
         layer_step_sizes = [1]
-        pos_step_sizes = [4]
+    if pos_step_sizes is None:
+        pos_step_sizes = [1]
 
     pair.print_position_mapping_debug("[coarse]")
 

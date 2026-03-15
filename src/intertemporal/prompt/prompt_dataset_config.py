@@ -57,8 +57,9 @@ class PromptDatasetConfig(BaseSchema):
     options: dict[str, OptionRangeConfig]
     time_horizons: list[TimeValue | None]
 
-    add_formatting_variations: bool = False
+    add_formatting_noise: bool = False
     do_variation_grid: bool = False
+    do_full_variation_grid: bool = False
     prompt_format: str = "default_prompt_format"
 
     @property

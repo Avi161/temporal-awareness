@@ -4,10 +4,19 @@ Run the full intertemporal preference experiment.
 
 Usage:
     # Quick test with minimal config
-    uv run python scripts/intertemporal/run_full_experiment.py --test
+    uv run python scripts/intertemporal/run_intertemporal_experiment.py
 
-    # Full pipeline
-    uv run python scripts/intertemporal/run_full_experiment.py
+    # Full pipeline with many samples
+    uv run python scripts/intertemporal/run_intertemporal_experiment.py --full
+
+    # Use cached data
+    uv run python scripts/intertemporal/run_intertemporal_experiment.py --cache
+
+    # Use cached data from a specific folder
+    uv run python scripts/intertemporal/run_intertemporal_experiment.py --cache my_experiment
+
+    # Save to a custom folder name
+    uv run python scripts/intertemporal/run_intertemporal_experiment.py --rename my_experiment
 """
 
 from __future__ import annotations
@@ -20,7 +29,8 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.common.profiler import P
-
+from src.common.logging import set_log_file, close_log_file, log, log_header, log_kv
+from src.intertemporal.common import get_experiment_dir
 from src.intertemporal.experiments.intertemporal_experiment import (
     ExperimentConfig,
     run_experiment,
@@ -32,7 +42,7 @@ from src.intertemporal.data.default_configs import (
 )
 
 
-def parse_args() -> ExperimentConfig:
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Run full intertemporal preference experiment",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -46,11 +56,25 @@ def parse_args() -> ExperimentConfig:
     )
     parser.add_argument(
         "--cache",
-        action="store_true",
-        help="Try loading cached data before recomputing",
+        nargs="?",
+        const=True,
+        default=False,
+        metavar="FOLDER",
+        help="Try loading cached data. Optionally specify folder name to load from.",
+    )
+    parser.add_argument(
+        "--rename",
+        type=str,
+        default=None,
+        metavar="NAME",
+        help="Custom folder name for output (only works without --cache)",
     )
 
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
 
     if args.full:
         config_dict = FULL_EXPERIMENT_CONFIG.copy()
@@ -60,15 +84,41 @@ def parse_args() -> ExperimentConfig:
     if args.model:
         config_dict["model"] = args.model
 
-    config_dict["try_loading_data"] = args.cache
+    exp_cfg = ExperimentConfig.from_dict(config_dict)
 
-    return ExperimentConfig.from_dict(config_dict)
+    # Determine output directory
+    output_dir = None
+    try_loading_data = bool(args.cache)
 
+    if args.cache and isinstance(args.cache, str):
+        # --cache FOLDER: load from specific folder
+        output_dir = get_experiment_dir() / args.cache
+    elif args.rename:
+        if args.cache:
+            print("Warning: --rename is ignored when --cache is used")
+        else:
+            # --rename NAME: use custom folder name
+            output_dir = get_experiment_dir() / args.rename
 
-def main() -> int:
-    exp_cfg = parse_args()
-    run_experiment(exp_cfg)
-    P.report()  # profiling
+    # If no custom output_dir, use default based on config ID
+    if output_dir is None:
+        output_dir = get_experiment_dir() / exp_cfg.get_id()
+
+    # Set up logging to file
+    output_dir.mkdir(parents=True, exist_ok=True)
+    set_log_file(output_dir / "log.txt")
+
+    log_header(f"EXPERIMENT: {exp_cfg.get_id()}", gap=1)
+    log_kv("Output", str(output_dir))
+    log()
+
+    try:
+        run_experiment(
+            exp_cfg, try_loading_data=try_loading_data, output_dir=output_dir
+        )
+        P.report()
+    finally:
+        close_log_file()
 
 
 if __name__ == "__main__":

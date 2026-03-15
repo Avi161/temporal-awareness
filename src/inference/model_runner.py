@@ -6,7 +6,7 @@ from typing import Any, Optional
 
 import torch
 
-from ..common.device_utils import get_device
+from ..common.device_utils import get_device, clear_gpu_memory
 from ..common.profiler import profile
 from .interventions import Intervention, Interventions
 from .backends import (
@@ -16,6 +16,8 @@ from .backends import (
     PyveneBackend,
     HuggingFaceBackend,
     MLXBackend,
+    OpenAIBackend,
+    AnthropicBackend,
     get_recommended_backend_inference,
 )
 from .generated_trajectory import (
@@ -34,6 +36,28 @@ class ModelRunner:
         dtype: Optional[torch.dtype] = None,
         backend: ModelBackend = get_recommended_backend_inference(),
     ):
+        # Parse cloud API model specs (e.g., "openai:gpt-4o", "anthropic:claude-sonnet-4-20250514")
+        if model_name.startswith("openai:"):
+            self.model_name = model_name[7:]  # Strip "openai:" prefix
+            self._backend = ModelBackend.OPENAI
+            self.device = "cpu"  # Not applicable for API
+            self.dtype = torch.float32
+            self._model = None
+            self._init_openai()
+            self._is_chat_model = True  # API models are always chat
+            print(f"Model loaded: OpenAI API {self.model_name}")
+            return
+        elif model_name.startswith("anthropic:"):
+            self.model_name = model_name[10:]  # Strip "anthropic:" prefix
+            self._backend = ModelBackend.ANTHROPIC
+            self.device = "cpu"  # Not applicable for API
+            self.dtype = torch.float32
+            self._model = None
+            self._init_anthropic()
+            self._is_chat_model = True  # API models are always chat
+            print(f"Model loaded: Anthropic API {self.model_name}")
+            return
+
         self.model_name = model_name
 
         if device is None:
@@ -57,7 +81,15 @@ class ModelRunner:
         elif backend == ModelBackend.HUGGINGFACE:
             self._init_huggingface()
         elif backend == ModelBackend.MLX:
-            self._init_mlx()
+            try:
+                self._init_mlx()
+            except ValueError as e:
+                if "not supported" in str(e):
+                    print(f"MLX doesn't support this model, using HuggingFace...")
+                    self._backend = ModelBackend.HUGGINGFACE
+                    self._init_huggingface()
+                else:
+                    raise
         else:
             raise ValueError(f"Unknown backend: {backend}")
 
@@ -66,6 +98,7 @@ class ModelRunner:
 
         print(f"Model loaded: {backend} {model_name} (chat={self._is_chat_model})")
         print(f"  n_layers={self.n_layers}, d_model={self.d_model}\n")
+        clear_gpu_memory()
 
     ############################
     #            API           #
@@ -94,6 +127,11 @@ class ModelRunner:
     @property
     def eos_token(self) -> str | None:
         return self._tokenizer.eos_token
+
+    @property
+    def is_cloud_api(self) -> bool:
+        """Whether this runner uses a cloud API backend (no local model)."""
+        return self._backend.is_cloud_api
 
     @property
     def n_layers(self) -> int:
@@ -143,6 +181,17 @@ class ModelRunner:
         Convenience method that accepts a list instead of tensor.
         """
         return self._backend.decode(torch.tensor(token_ids))
+
+    def tokenize(
+        self, text: str, add_special_tokens: bool = True, prepend_bos: bool = False
+    ) -> torch.Tensor:
+        """Tokenize text into tensor of token IDs.
+
+        Alias for encode() - returns token IDs tensor of shape [1, seq_len].
+        """
+        return self.encode(
+            text, add_special_tokens=add_special_tokens, prepend_bos=prepend_bos
+        )
 
     # High-level API
 
@@ -311,6 +360,13 @@ class ModelRunner:
         self,
         token_ids_batch: list[list[int]],
     ) -> list[GeneratedTrajectory]:
+        if self.is_cloud_api:
+            raise NotImplementedError(
+                "Cloud API backends don't support compute_trajectories_batch. "
+                "Use BinaryChoiceRunner.choose() which calls the polymorphic "
+                "compute_binary_choice_trajectories() method instead."
+            )
+
         max_len = max(len(ids) for ids in token_ids_batch)
         pad_token = self._tokenizer.pad_token_id or 0
         padded = [ids + [pad_token] * (max_len - len(ids)) for ids in token_ids_batch]
@@ -325,9 +381,12 @@ class ModelRunner:
             logits_batch = self._backend.forward(
                 input_ids_batch
             )  # [batch, seq_len, vocab_size]
-        return calculate_trajectories_for_batch(
+        trajs = calculate_trajectories_for_batch(
             token_ids_batch, logits_batch, self.device
         )
+        # Explicitly release large tensors
+        del logits_batch, input_ids_batch
+        return trajs
 
     # Basic Interpretability APIs
 
@@ -546,22 +605,28 @@ class ModelRunner:
         return self._backend.get_W_E()
 
     @property
-    def W_U(self) -> torch.Tensor:
+    def W_U(self) -> torch.Tensor | None:
         """Unembedding matrix W_U.
 
         Returns:
-            Unembedding matrix of shape [d_model, vocab_size]
+            Unembedding matrix of shape [d_model, vocab_size], or None if unsupported
         """
-        return self._backend.get_W_U()
+        try:
+            return self._backend.get_W_U()
+        except NotImplementedError:
+            return None
 
     @property
     def b_U(self) -> torch.Tensor | None:
         """Unembedding bias b_U.
 
         Returns:
-            Unembedding bias of shape [vocab_size], or None if no bias
+            Unembedding bias of shape [vocab_size], or None if no bias/unsupported
         """
-        return self._backend.get_b_U()
+        try:
+            return self._backend.get_b_U()
+        except NotImplementedError:
+            return None
 
     # Basic Forward API
 
@@ -618,6 +683,10 @@ class ModelRunner:
         ]
 
     def apply_chat_template(self, prompt: str) -> str:
+        # Cloud API backends handle chat formatting internally
+        if self.is_cloud_api:
+            return prompt
+
         if not self._is_chat_model:
             # print(f"apply_chat_template: {self.model_name} is not chat model")
             return prompt
@@ -656,7 +725,7 @@ class ModelRunner:
 
         print(f"Loading {self.model_name} on {self.device} (nnsight)...")
         self._model = LanguageModel(
-            self.model_name, device_map=self.device, dtype=self.dtype
+            self.model_name, device_map=self.device, dtype=self.dtype, trust_remote_code=True
         )
         self._backend = NNsightBackend(self)
 
@@ -665,10 +734,10 @@ class ModelRunner:
 
         print(f"Loading {self.model_name} on {self.device} (pyvene)...")
         self._model = AutoModelForCausalLM.from_pretrained(
-            self.model_name, torch_dtype=self.dtype
+            self.model_name, torch_dtype=self.dtype, trust_remote_code=True
         ).to(self.device)
         self._model.eval()
-        tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        tokenizer = AutoTokenizer.from_pretrained(self.model_name, trust_remote_code=True)
         self._backend = PyveneBackend(self, tokenizer)
 
     def _init_huggingface(self) -> None:
@@ -676,10 +745,10 @@ class ModelRunner:
 
         print(f"Loading {self.model_name} on {self.device} (HuggingFace)...")
         self._model = AutoModelForCausalLM.from_pretrained(
-            self.model_name, torch_dtype=self.dtype
+            self.model_name, torch_dtype=self.dtype, trust_remote_code=True
         ).to(self.device)
         self._model.eval()
-        tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        tokenizer = AutoTokenizer.from_pretrained(self.model_name, trust_remote_code=True)
         self._backend = HuggingFaceBackend(self, tokenizer)
 
     def _init_mlx(self) -> None:
@@ -688,6 +757,12 @@ class ModelRunner:
         print(f"Loading {self.model_name} (MLX)...")
         self._model, tokenizer = load(self.model_name)
         self._backend = MLXBackend(self, tokenizer)
+
+    def _init_openai(self) -> None:
+        self._backend = OpenAIBackend(self, model=self.model_name)
+
+    def _init_anthropic(self) -> None:
+        self._backend = AnthropicBackend(self, model=self.model_name)
 
     def _detect_chat_model(self, model_name: str) -> bool:
         """Detect if model is a chat/instruct model based on name.
@@ -755,6 +830,8 @@ class ModelRunner:
     @property
     def is_reasoning_model(self) -> bool:
         """Whether this model supports thinking/reasoning mode."""
+        if self.is_cloud_api:
+            return False
         if not hasattr(self, "_is_reasoning_model"):
             self._is_reasoning_model = self._detect_reasoning_model()
         return self._is_reasoning_model
@@ -763,8 +840,10 @@ class ModelRunner:
     def skip_thinking_prefix(self) -> str:
         """Prefix to skip thinking mode for reasoning models.
 
-        Returns empty string for non-reasoning models.
+        Returns empty string for non-reasoning models and cloud API backends.
         """
+        if self.is_cloud_api:
+            return ""
         if self.is_reasoning_model:
             return "<think>\n</think>\n\n"
         return ""

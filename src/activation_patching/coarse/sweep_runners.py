@@ -83,11 +83,7 @@ def run_layer_sweep(
             )
 
             result = patch_target(
-                runner,
-                pair,
-                dn_target,
-                denoising_target=dn_target,
-                noising_target=ns_target,
+                runner, pair, dn_target, denoising_target=dn_target, noising_target=ns_target
             )
             layer_results[layer_step][layer_range[0]] = result
             print(

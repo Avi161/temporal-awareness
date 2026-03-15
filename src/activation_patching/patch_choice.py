@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-from .act_patch_results import (
-    ActPatchPairResult,
-    ActPatchTargetResult,
-    IntervenedChoice,
-)
+from .act_patch_results import ActPatchPairResult, ActPatchTargetResult
+from .intervened_choice import IntervenedChoice
 from ..binary_choice import BinaryChoiceRunner
 from ..common.contrastive_pair import ContrastivePair
 from ..common.hook_utils import hook_filter_for_component, hook_filter_exact, hook_name
@@ -21,75 +18,79 @@ def patch_for_choice(
     mode: PatchingMode,
     alpha: float = 1.0,
 ) -> IntervenedChoice:
-    """Run single activation patching experiment.
+    """Run activation patching experiment.
+
+    Uses multilabel_choose to evaluate all label pairs in one forward pass.
+    Returns IntervenedChoice with GroupedBinaryChoice objects that contain
+    results for all label pairs.
 
     Args:
         runner: BinaryChoiceRunner for model inference
         pair: ContrastivePair (no activation required)
         target: InterventionTarget specifying layers and positions to patch
         mode: Patching mode:
-            - "denoising": Run on corrupted text, patch in clean activations (REMOVE noise)
-            - "noising": Run on clean text, patch in corrupted activations (ADD noise)
+            - "denoising": Run on corrupted text, patch in clean activations
+            - "noising": Run on clean text, patch in corrupted activations
         alpha: Interpolation strength (1.0 = full patch, 0.0 = no patch)
 
     Returns:
-        IntervenedChoice with original and intervened model outputs
+        IntervenedChoice with GroupedBinaryChoice for baseline_clean,
+        baseline_corrupted, and intervened.
     """
-    # Build names_filter to capture internals for the component we're patching
-    # Only cache the source activations (clean for denoising, corrupted for noising)
     component = target.component or "resid_post"
     names_filter = hook_filter_for_component(component)
 
-    clean_choice = runner.choose(
+    # Build label list: [clean_labels, corrupted_labels]
+    all_labels = [pair.clean_labels, pair.corrupted_labels]
+
+    # Get baseline grouped choices
+    clean_grouped = runner.multilabel_choose(
         pair.clean_prompt,
         pair.choice_prefix,
-        pair.clean_labels,
+        all_labels,
         with_cache=(mode == "denoising"),
         names_filter=names_filter if mode == "denoising" else None,
     )
-    corrupted_choice = runner.choose(
+    corrupted_grouped = runner.multilabel_choose(
         pair.corrupted_prompt,
         pair.choice_prefix,
-        pair.corrupted_labels,
+        all_labels,
         with_cache=(mode == "noising"),
         names_filter=names_filter if mode == "noising" else None,
     )
 
-    intervention = pair.create_patching_intervention(
-        target, mode, clean_choice, corrupted_choice, alpha
-    )
-    if mode == "denoising":
-        run_prompt = pair.corrupted_prompt
-        run_labels = pair.corrupted_labels
-    elif mode == "noising":
-        run_prompt = pair.clean_prompt
-        run_labels = pair.clean_labels
-    else:
-        raise ValueError(f"Invalid mode: {mode}")
+    # For intervention, use the "native" choice for each prompt:
+    # - clean_prompt with clean_labels (index 0)
+    # - corrupted_prompt with corrupted_labels (index 1)
+    clean_for_intervention = clean_grouped.choices[0]
+    corrupted_for_intervention = corrupted_grouped.choices[1]
 
-    # Minimal filter for TCB: only capture final layer resid_post
+    # Create intervention using native label choices
+    intervention = pair.create_patching_intervention(
+        target, mode, clean_for_intervention, corrupted_for_intervention, alpha
+    )
+
+    # Run with intervention
+    run_prompt = pair.corrupted_prompt if mode == "denoising" else pair.clean_prompt
+
     final_layer_hook = hook_name(runner.n_layers - 1, "resid_post")
     tcb_filter = hook_filter_exact(final_layer_hook)
 
-    # Run intervention with cache to capture internals for TCB computation
-    intervened_choice = runner.choose(
+    intervened_grouped = runner.multilabel_choose(
         run_prompt,
         pair.choice_prefix,
-        run_labels,
+        all_labels,
         intervention=intervention,
         with_cache=True,
         names_filter=tcb_filter,
     )
 
-    # Strip heavy tensors to save memory (we only need metrics)
-    clean_choice.pop_heavy()
-    corrupted_choice.pop_heavy()
-    intervened_choice.pop_heavy()
-
+    # Store the full GroupedBinaryChoice objects
+    # Viz code can use .choices or .get_choice(i) to extract per-label results
     return IntervenedChoice(
-        baseline_clean=clean_choice,
-        baseline_corrupted=corrupted_choice,
-        intervened=intervened_choice,
+        baseline_clean=clean_grouped,
+        baseline_corrupted=corrupted_grouped,
+        intervened=intervened_grouped,
         mode=mode,
     )
 
@@ -111,22 +112,22 @@ def patch_target(
         pair: ContrastivePair with cached activations
         target: Default InterventionTarget (used if mode-specific target not provided)
         alpha: Interpolation strength
-        denoising_target: Optional separate target for denoising mode (None = use default)
-        noising_target: Optional separate target for noising mode (None = use default)
-        skip_denoising: If True, skip denoising mode entirely
-        skip_noising: If True, skip noising mode entirely
+        denoising_target: Optional separate target for denoising mode
+        noising_target: Optional separate target for noising mode
+        skip_denoising: If True, skip denoising mode
+        skip_noising: If True, skip noising mode
 
     Returns:
-        ActPatchTargetResult with denoising and noising results
+        ActPatchTargetResult with IntervenedChoice for each mode
     """
     result = ActPatchTargetResult(target=target)
 
     if not skip_denoising:
-        dn_target = denoising_target if denoising_target is not None else target
+        dn_target = denoising_target or target
         result.denoising = patch_for_choice(runner, pair, dn_target, "denoising", alpha)
 
     if not skip_noising:
-        ns_target = noising_target if noising_target is not None else target
+        ns_target = noising_target or target
         result.noising = patch_for_choice(runner, pair, ns_target, "noising", alpha)
 
     return result
@@ -147,13 +148,12 @@ def patch_pair(
         alpha: Interpolation strength (1.0 = full patch, 0.0 = no patch)
 
     Returns:
-        ActPatchPairResult with patching results for all targets and modes
+        ActPatchPairResult with patching results for all targets
     """
     result = ActPatchPairResult(sample_id=pair.sample_id)
 
     for target in targets:
-        for mode in ("denoising", "noising"):
-            choice = patch_for_choice(runner, pair, target, mode, alpha)
-            result.add(target, mode, choice)
+        target_result = patch_target(runner, pair, target, alpha)
+        result.by_target[target] = target_result
 
     return result

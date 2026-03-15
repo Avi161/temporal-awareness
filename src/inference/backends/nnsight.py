@@ -288,8 +288,18 @@ class NNsightBackend(Backend):
                     elif mode == "mul":
                         out[:, :] *= values
                     elif mode == "interpolate" and target_values is not None:
-                        # out = out + alpha * (target_values - out)
-                        out[:, :] = out[:, :] + alpha * (target_values - out[:, :])
+                        # Handle sequence length mismatch for 2D target_values
+                        if target_values.ndim == 2:
+                            if out.ndim == 3:
+                                seq_len = min(out.shape[1], target_values.shape[0])
+                                tv = target_values[:seq_len].unsqueeze(0)
+                                out[:, :seq_len, :] = out[:, :seq_len, :] + alpha * (tv - out[:, :seq_len, :])
+                            else:
+                                # out is 2D: [seq_len, d_model]
+                                seq_len = min(out.shape[0], target_values.shape[0])
+                                out[:seq_len, :] = out[:seq_len, :] + alpha * (target_values[:seq_len] - out[:seq_len, :])
+                        else:
+                            out[:, :] = out[:, :] + alpha * (target_values - out[:, :])
                 else:
                     seq_len = out.shape[0] if out.ndim == 2 else out.shape[1]
                     for i, pos in enumerate(target.positions):

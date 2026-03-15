@@ -25,7 +25,7 @@ def plot_comparison(
 ) -> None:
     """Plot denoising vs noising comparison scatter plots.
 
-    Creates a 1x2 figure with layer comparison (left) and position comparison (right).
+    Creates single-panel or two-panel figure depending on available data.
 
     Args:
         layer_data: Layer sweep results
@@ -34,18 +34,32 @@ def plot_comparison(
         coloring: Token coloring for position colors
         step_size: Step size used in the sweep
     """
-    fig, axes = plt.subplots(1, 2, figsize=(18, 8), facecolor="white")
+    has_layer = bool(layer_data)
+    has_position = bool(position_data)
+
+    if not has_layer and not has_position:
+        return
+
+    # Determine layout based on available data
+    if has_layer and has_position:
+        fig, axes = plt.subplots(1, 2, figsize=(18, 8), facecolor="white")
+        _plot_layer_comparison(axes[0], layer_data)
+        _plot_position_comparison(axes[1], position_data, coloring)
+        title_suffix = f"(step={step_size})"
+    elif has_layer:
+        fig, ax = plt.subplots(figsize=(10, 8), facecolor="white")
+        _plot_layer_comparison(ax, layer_data)
+        title_suffix = f"Layer Sweep (step={step_size})"
+    else:
+        fig, ax = plt.subplots(figsize=(10, 8), facecolor="white")
+        _plot_position_comparison(ax, position_data, coloring)
+        title_suffix = f"Position Sweep (step={step_size})"
+
     fig.suptitle(
-        f"Activation Patching: Denoising vs Noising Recovery (step size={step_size})",
-        fontsize=20,
+        f"Activation Patching: Denoising vs Noising {title_suffix}",
+        fontsize=18,
         fontweight="bold",
     )
-
-    # Layer comparison
-    _plot_layer_comparison(axes[0], layer_data)
-
-    # Position comparison
-    _plot_position_comparison(axes[1], position_data, coloring)
 
     # Save
     plt.tight_layout(rect=[0, 0, 1, 0.95])
@@ -80,8 +94,10 @@ def _plot_layer_comparison(
     label_indices.add(0)  # First layer
     label_indices.add(len(layers) - 1)  # Last layer
 
-    # Plot points
+    # Plot points (skip if either value is None)
     for i, (rec, dis, layer) in enumerate(zip(recoveries, disruptions, layers)):
+        if rec is None or dis is None:
+            continue
         ax.scatter(
             rec,
             dis,
@@ -119,8 +135,10 @@ def _plot_position_comparison(
     # Find extreme points to label (top 3 to reduce clutter)
     label_indices = _get_extreme_indices(recoveries, disruptions, n_top=3)
 
-    # Plot points
+    # Plot points (skip if either value is None)
     for i, (rec, dis, pos) in enumerate(zip(recoveries, disruptions, positions)):
+        if rec is None or dis is None:
+            continue
         ax.scatter(
             rec,
             dis,
@@ -138,13 +156,17 @@ def _plot_position_comparison(
 
 
 def _get_extreme_indices(
-    recoveries: list[float],
-    disruptions: list[float],
+    recoveries: list[float | None],
+    disruptions: list[float | None],
     n_top: int = 5,
 ) -> set[int]:
-    """Get indices of extreme points in recovery and disruption."""
-    rec_arr = np.array(recoveries)
-    dis_arr = np.array(disruptions)
+    """Get indices of extreme points in recovery and disruption.
+
+    Handles None values by treating them as -inf for sorting purposes.
+    """
+    # Replace None with -inf so they sort to the end (we want highest values)
+    rec_arr = np.array([r if r is not None else -np.inf for r in recoveries])
+    dis_arr = np.array([d if d is not None else -np.inf for d in disruptions])
     rec_sorted_idx = np.argsort(rec_arr)[::-1][:n_top]
     dis_sorted_idx = np.argsort(dis_arr)[::-1][:n_top]
     return set(rec_sorted_idx) | set(dis_sorted_idx)

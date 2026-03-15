@@ -8,6 +8,7 @@ from typing import Any
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 
+from ...common import profile
 from ...common.contrastive_pair import ContrastivePair
 from ...viz.plot_helpers import finalize_plot as _finalize_plot
 from ...viz.palettes import TOKEN_COLORS
@@ -18,6 +19,7 @@ from ...viz.token_coloring import (
 )
 
 
+@profile
 def visualize_tokenization(
     pairs: list[ContrastivePair],
     runner: Any,

@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from typing import Literal
 
 from .....activation_patching.coarse import CoarseActPatchAggregatedResults
-from .....activation_patching.act_patch_metrics import IntervenedChoiceMetrics
+from .....activation_patching.act_patch_metrics import IntervenedChoiceMetrics, LabelPerspective
 from .style import COLUMN_METRICS
 
 
@@ -52,6 +52,7 @@ def extract_column_data(
     sweep_type: Literal["layer", "position"],
     clean_traj: Literal["short", "long"],
     mode: Literal["denoising", "noising"],
+    label_perspective: LabelPerspective = "clean",
 ) -> ColumnData:
     """Extract metric data for a column, aggregated across pairs and step sizes.
 
@@ -61,18 +62,17 @@ def extract_column_data(
         sweep_type: "layer" or "position"
         clean_traj: "short" or "long" - which is treated as clean
         mode: "denoising" or "noising"
+        label_perspective: Which label system to use for metrics:
+            - "clean": Use clean labels (default)
+            - "corrupted": Use corrupted labels
+            - "combined": Aggregate across both label systems
 
     Returns:
         ColumnData with metrics aligned to common x-axis
     """
     # Get metric names for this column
+    # Uses computed properties (effect, effect_reciprocal_rank) that are mode-aware
     metric_names = list(COLUMN_METRICS.get(column_name, []))
-
-    # For core column, use disruption instead of recovery for noising mode
-    if column_name == "core" and mode == "noising":
-        metric_names = [
-            "disruption" if m == "recovery" else m for m in metric_names
-        ]
 
     # Collect all x-values across all samples and step sizes
     all_x_values: set[int] = set()
@@ -126,17 +126,17 @@ def extract_column_data(
                     if clean_traj == "short":
                         # short=clean: denoising recovers short, noising disrupts short
                         if mode == "denoising":
-                            metrics = target_result.get_denoising_metrics()
+                            metrics = target_result.get_denoising_metrics(label_perspective)
                         else:
-                            metrics = target_result.get_noising_metrics()
+                            metrics = target_result.get_noising_metrics(label_perspective)
                     else:
                         # long=clean: need to switch perspective
                         # What was denoising (recover short) becomes noising (disrupt long)
                         switched = target_result.switch()
                         if mode == "denoising":
-                            metrics = switched.get_denoising_metrics()
+                            metrics = switched.get_denoising_metrics(label_perspective)
                         else:
-                            metrics = switched.get_noising_metrics()
+                            metrics = switched.get_noising_metrics(label_perspective)
 
                     # Extract the metric value
                     value = getattr(metrics, metric_name, None)

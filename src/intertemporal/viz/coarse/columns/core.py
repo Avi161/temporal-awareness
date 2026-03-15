@@ -38,20 +38,21 @@ def plot(
     Returns:
         Secondary (right) y-axis for synchronization
     """
-    # Extract metric arrays
-    recoveries = [m.recovery for m in metrics]
-    logit_diffs = [m.logit_diff for m in metrics]
-    norm_logit_diffs = [m.norm_logit_diff for m in metrics]
-    rr_shorts = [m.reciprocal_rank_short for m in metrics]
+    # Extract metric arrays - use mode-aware effect metrics (target - source semantics)
+    effect_values = [m.effect for m in metrics]
+    effect_label = "recovery" if mode == "denoising" else "disruption"
+    rr_values = [m.effect_reciprocal_rank for m in metrics]
+    rr_label = "recip_rank(target)"
+    logit_diffs = [m.effect_logit_diff for m in metrics]
+    norm_logit_diffs = [m.effect_norm_logit_diff for m in metrics]
 
     # Primary axis: recovery/disruption and reciprocal_rank
-    metric_label = "recovery" if mode == "denoising" else "disruption"
     plot_line(
         ax,
         x_values,
         LineConfig(
-            values=recoveries,
-            label=metric_label,
+            values=effect_values,
+            label=effect_label,
             color_key="recovery",
             markevery_offset=0,
         ),
@@ -60,8 +61,8 @@ def plot(
         ax,
         x_values,
         LineConfig(
-            values=rr_shorts,
-            label="recip_rank(clean)",
+            values=rr_values,
+            label=rr_label,
             color_key="rr_short",
             markevery_offset=1,
         ),
