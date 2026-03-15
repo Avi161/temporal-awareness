@@ -8,6 +8,12 @@ from ...common import BaseSchema
 from ..preference import PreferenceDataset
 from ..prompt import PromptDatasetConfig
 
+# Default coarse patching settings (empty dict or empty lists = skip)
+COARSE_PATCH: dict = {
+    "layer_steps": [1],
+    "pos_steps": [1],
+}
+
 
 @dataclass
 class ExperimentConfig(BaseSchema):
@@ -19,9 +25,8 @@ class ExperimentConfig(BaseSchema):
     max_samples: int | None = None
     n_pairs: int | None = None
 
-    # Coarse patching sweep settings (empty list = skip sweep)
-    coarse_layer_steps: list[int] = field(default_factory=lambda: [1])
-    coarse_pos_steps: list[int] = field(default_factory=lambda: [1])
+    # Coarse patching settings
+    coarse_patch: dict = field(default_factory=lambda: COARSE_PATCH.copy())
 
     @property
     def name(self) -> str:

@@ -83,8 +83,8 @@ def step_coarse_activation_patching(
         result = run_coarse_act_patching(
             ctx.runner,
             pair,
-            layer_step_sizes=ctx.cfg.coarse_layer_steps,
-            pos_step_sizes=ctx.cfg.coarse_pos_steps,
+            layer_step_sizes=ctx.cfg.coarse_patch.get("layer_steps"),
+            pos_step_sizes=ctx.cfg.coarse_patch.get("pos_steps"),
         )
         result.sample_id = pair_idx
         ctx.coarse_patching[pair_idx] = result
