@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal
+from typing import Literal
 
 from ..common.base_schema import BaseSchema
 from ..common.math import logaddexp
 from ..common.patching_types import PatchingMode
 
-if TYPE_CHECKING:
-    from .intervened_choice import IntervenedChoice
+from .intervened_choice import IntervenedChoice
 
 # Label perspective types
 LabelPerspective = Literal["clean", "corrupted", "combined"]
@@ -201,48 +200,44 @@ class IntervenedChoiceMetrics(BaseSchema):
         metrics.logit_diff = lp_short - lp_long
 
         # ForkMetrics from tree.forks[0].analysis.metrics
-        if tree is None:
-            raise ValueError("intervened.tree is None - tree required for fork metrics")
-        if not tree.forks:
-            raise ValueError(
-                f"tree.forks is empty - tree has {len(tree.nodes) if tree.nodes else 0} nodes but no forks"
-            )
-        if tree.forks[0].analysis is None:
-            raise ValueError(f"tree.forks[0].analysis is None - fork={tree.forks[0]}")
+        # Gracefully handle missing tree/forks/analysis - skip fork metrics if unavailable
+        fork_metrics = None
+        if tree is not None and tree.forks and tree.forks[0].analysis is not None:
+            fork_metrics = tree.forks[0].analysis.metrics
 
-        fork_metrics = tree.forks[0].analysis.metrics
-        metrics.logit_diff = fork_metrics.logit_diff
-        # effect_logit_diff: target - source (positive = toward target)
-        metrics.effect_logit_diff = (
-            metrics.logit_diff if metrics.mode == "denoising" else -metrics.logit_diff
-        )
-        metrics.fork_entropy = fork_metrics.fork_entropy
-        metrics.fork_diversity = fork_metrics.fork_diversity
-        metrics.fork_simpson = fork_metrics.fork_simpson
-        # reciprocal_rank_a is for the A token (short)
-        metrics.reciprocal_rank_short = fork_metrics.reciprocal_rank_a
-        # For B token, it's the complement
-        metrics.reciprocal_rank_long = 1.0 - fork_metrics.reciprocal_rank_a + 0.5
-        # effect_reciprocal_rank: short for denoising (target=clean), long for noising (target=corrupt)
-        metrics.effect_reciprocal_rank = (
-            metrics.reciprocal_rank_short
-            if metrics.mode == "denoising"
-            else metrics.reciprocal_rank_long
-        )
-        # Raw logits and normalized logits
-        if fork_metrics.logits is not None:
-            metrics.logit_short, metrics.logit_long = fork_metrics.logits
-        if fork_metrics.normalized_logits is not None:
-            metrics.norm_logit_short, metrics.norm_logit_long = (
-                fork_metrics.normalized_logits
+        if fork_metrics is not None:
+            metrics.logit_diff = fork_metrics.logit_diff
+            # effect_logit_diff: target - source (positive = toward target)
+            metrics.effect_logit_diff = (
+                metrics.logit_diff if metrics.mode == "denoising" else -metrics.logit_diff
             )
-            metrics.norm_logit_diff = metrics.norm_logit_short - metrics.norm_logit_long
-            # effect_norm_logit_diff: target - source (positive = toward target)
-            metrics.effect_norm_logit_diff = (
-                metrics.norm_logit_diff
+            metrics.fork_entropy = fork_metrics.fork_entropy
+            metrics.fork_diversity = fork_metrics.fork_diversity
+            metrics.fork_simpson = fork_metrics.fork_simpson
+            # reciprocal_rank_a is for the A token (short)
+            metrics.reciprocal_rank_short = fork_metrics.reciprocal_rank_a
+            # For B token, it's the complement
+            metrics.reciprocal_rank_long = 1.0 - fork_metrics.reciprocal_rank_a + 0.5
+            # effect_reciprocal_rank: short for denoising (target=clean), long for noising (target=corrupt)
+            metrics.effect_reciprocal_rank = (
+                metrics.reciprocal_rank_short
                 if metrics.mode == "denoising"
-                else -metrics.norm_logit_diff
+                else metrics.reciprocal_rank_long
             )
+            # Raw logits and normalized logits
+            if fork_metrics.logits is not None:
+                metrics.logit_short, metrics.logit_long = fork_metrics.logits
+            if fork_metrics.normalized_logits is not None:
+                metrics.norm_logit_short, metrics.norm_logit_long = (
+                    fork_metrics.normalized_logits
+                )
+                metrics.norm_logit_diff = metrics.norm_logit_short - metrics.norm_logit_long
+                # effect_norm_logit_diff: target - source (positive = toward target)
+                metrics.effect_norm_logit_diff = (
+                    metrics.norm_logit_diff
+                    if metrics.mode == "denoising"
+                    else -metrics.norm_logit_diff
+                )
 
         # Compute relative logit delta (change from baseline, normalized)
         if abs(metrics.baseline_logit_diff) > 1e-6:
@@ -257,7 +252,7 @@ class IntervenedChoiceMetrics(BaseSchema):
             )
 
         # NodeMetrics from tree.nodes[0].analysis.metrics
-        if tree.nodes and tree.nodes[0].analysis:
+        if tree is not None and tree.nodes and tree.nodes[0].analysis:
             node_metrics = tree.nodes[0].analysis.metrics
             metrics.vocab_entropy = node_metrics.vocab_entropy
             metrics.vocab_diversity = node_metrics.vocab_diversity
@@ -271,7 +266,7 @@ class IntervenedChoiceMetrics(BaseSchema):
             metrics.inv_perplexity = traj_metrics.inv_perplexity
 
         # Trajectory inv_perplexity from continuation_only (trajs[0]=A, trajs[1]=B)
-        if tree.trajs and len(tree.trajs) >= 2:
+        if tree is not None and tree.trajs and len(tree.trajs) >= 2:
             traj_a = tree.trajs[0]
             traj_b = tree.trajs[1]
             if traj_a.analysis and traj_a.analysis.continuation_only:
