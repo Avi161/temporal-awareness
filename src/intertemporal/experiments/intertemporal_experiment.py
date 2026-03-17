@@ -79,30 +79,34 @@ def step_coarse_activation_patching(
         single_component = ctx.cfg.coarse_patch.get("component", "resid_post")
         components = [single_component]
 
-    if try_loading_data and ctx.load_coarse_agg():
-        log("[coarse] Loaded cached aggregated results")
-        ctx.coarse_agg.print_summary()
-        return
-
     # Run sweeps for each component
     for component in components:
-        log(f"[coarse] Running sweeps for component: {component}", gap=1)
         ctx.coarse_agg_by_component[component] = CoarseActPatchAggregatedResults()
+        all_loaded = True
 
         for pair_idx, pair in enumerate(ctx.pairs):
-            log(f"[coarse] Processing pair {pair_idx + 1}/{len(ctx.pairs)}, component={component}")
-            result = run_coarse_act_patching(
-                ctx.runner,
-                pair,
-                component=component,
-                layer_step_sizes=ctx.cfg.coarse_patch.get("layer_steps"),
-                pos_step_sizes=ctx.cfg.coarse_patch.get("pos_steps"),
-            )
-            result.sample_id = pair_idx
-            ctx.coarse_patching[(pair_idx, component)] = result
-            ctx.coarse_agg_by_component[component].add(result)
-            ctx.save_coarse_pair(pair_idx, component)
+            # Try to load cached result first
+            if try_loading_data and ctx.load_coarse_pair(pair_idx, component):
+                result = ctx.coarse_patching[(pair_idx, component)]
+                ctx.coarse_agg_by_component[component].add(result)
+                log(f"[coarse] Loaded cached pair {pair_idx + 1}/{len(ctx.pairs)}, component={component}")
+            else:
+                all_loaded = False
+                log(f"[coarse] Processing pair {pair_idx + 1}/{len(ctx.pairs)}, component={component}")
+                result = run_coarse_act_patching(
+                    ctx.runner,
+                    pair,
+                    component=component,
+                    layer_step_sizes=ctx.cfg.coarse_patch.get("layer_steps"),
+                    pos_step_sizes=ctx.cfg.coarse_patch.get("pos_steps"),
+                )
+                result.sample_id = pair_idx
+                ctx.coarse_patching[(pair_idx, component)] = result
+                ctx.coarse_agg_by_component[component].add(result)
+                ctx.save_coarse_pair(pair_idx, component)
 
+        if all_loaded:
+            log(f"[coarse] All pairs loaded from cache for component: {component}")
         ctx.coarse_agg_by_component[component].print_summary()
 
     # Also save combined aggregated results (first component for backwards compat)
