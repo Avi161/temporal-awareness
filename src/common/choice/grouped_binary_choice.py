@@ -15,7 +15,6 @@ Example:
     Final choice = aggregate across forks
 """
 
-from ..analysis import analyze_token_tree
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
@@ -23,6 +22,7 @@ from enum import Enum
 
 import math
 
+from ..analysis import analyze_token_tree
 from ..token_tree import BinaryFork, TokenTree
 from .binary_choice import LabeledBinaryChoice
 from .simple_binary_choice import SimpleBinaryChoice, LabeledSimpleBinaryChoice

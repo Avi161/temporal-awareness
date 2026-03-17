@@ -117,6 +117,7 @@ def main() -> int:
             exp_cfg, try_loading_data=try_loading_data, output_dir=output_dir
         )
         P.report()
+        P.save(output_dir / "profile.json")
     finally:
         close_log_file()
 

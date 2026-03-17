@@ -89,10 +89,11 @@ def _plot_layer_comparison(
     # Viridis colormap for layers
     colors = plt.cm.viridis(np.linspace(0, 1, len(layers)))
 
-    # Find extreme points to label
+    # Build label indices: extreme points + evenly spaced
     label_indices = _get_extreme_indices(recoveries, disruptions, n_top=5)
     label_indices.add(0)  # First layer
     label_indices.add(len(layers) - 1)  # Last layer
+    label_indices |= _get_evenly_spaced_indices(len(layers), n_labels=8)
 
     # Plot points (skip if either value is None)
     for i, (rec, dis, layer) in enumerate(zip(recoveries, disruptions, layers)):
@@ -132,8 +133,11 @@ def _plot_position_comparison(
     disruptions = [position_data[p].disruption for p in positions]
     point_colors = [get_tick_color(p, coloring) for p in positions]
 
-    # Find extreme points to label (top 3 to reduce clutter)
-    label_indices = _get_extreme_indices(recoveries, disruptions, n_top=3)
+    # Build label indices: extreme points + evenly spaced
+    label_indices = _get_extreme_indices(recoveries, disruptions, n_top=5)
+    label_indices.add(0)  # First position
+    label_indices.add(len(positions) - 1)  # Last position
+    label_indices |= _get_evenly_spaced_indices(len(positions), n_labels=10)
 
     # Plot points (skip if either value is None)
     for i, (rec, dis, pos) in enumerate(zip(recoveries, disruptions, positions)):
@@ -170,6 +174,17 @@ def _get_extreme_indices(
     rec_sorted_idx = np.argsort(rec_arr)[::-1][:n_top]
     dis_sorted_idx = np.argsort(dis_arr)[::-1][:n_top]
     return set(rec_sorted_idx) | set(dis_sorted_idx)
+
+
+def _get_evenly_spaced_indices(n_total: int, n_labels: int = 8) -> set[int]:
+    """Get evenly spaced indices for labeling.
+
+    Distributes labels evenly across the index range.
+    """
+    if n_total <= n_labels:
+        return set(range(n_total))
+    step = (n_total - 1) / (n_labels - 1)
+    return {int(round(i * step)) for i in range(n_labels)}
 
 
 def _add_point_label(ax: plt.Axes, x: float, y: float, label: str) -> None:

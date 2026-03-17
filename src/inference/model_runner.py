@@ -693,6 +693,15 @@ class ModelRunner:
         tokenizer = self._tokenizer
         if hasattr(tokenizer, "apply_chat_template"):
             # print(f"apply_chat_template: True for {self.model_name}")
+            # Some models (e.g., Qwen 3.5) use enable_thinking parameter,
+            # while others (e.g., Qwen 3) use prefix-based soft switch
+            if self._disables_thinking_via_template:
+                return tokenizer.apply_chat_template(
+                    [{"role": "user", "content": prompt}],
+                    tokenize=False,
+                    add_generation_prompt=True,
+                    enable_thinking=False,
+                )
             return tokenizer.apply_chat_template(
                 [{"role": "user", "content": prompt}],
                 tokenize=False,
@@ -837,12 +846,27 @@ class ModelRunner:
         return self._is_reasoning_model
 
     @property
+    def _disables_thinking_via_template(self) -> bool:
+        """Whether thinking is disabled via chat template param (not prefix).
+
+        Qwen 3.5 uses enable_thinking=False in apply_chat_template,
+        while Qwen 3 uses empty thinking prefix (<think></think>).
+        """
+        if not hasattr(self, "_cached_disables_thinking_via_template"):
+            name = self.model_name.lower()
+            self._cached_disables_thinking_via_template = any(
+                x in name for x in ["qwen3.5", "qwen-3.5", "qwen_3.5"]
+            )
+        return self._cached_disables_thinking_via_template
+
+    @property
     def skip_thinking_prefix(self) -> str:
         """Prefix to skip thinking mode for reasoning models.
 
-        Returns empty string for non-reasoning models and cloud API backends.
+        Returns empty string for non-reasoning models, cloud API backends,
+        and models that disable thinking via chat template parameter.
         """
-        if self.is_cloud_api:
+        if self.is_cloud_api or self._disables_thinking_via_template:
             return ""
         if self.is_reasoning_model:
             return "<think>\n</think>\n\n"

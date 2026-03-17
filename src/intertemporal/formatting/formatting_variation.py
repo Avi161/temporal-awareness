@@ -25,8 +25,8 @@ from src.common import TimeValue, TIME_UNIT_TO_YEARS, TIME_UNITS
 SIMPLE_LABEL_STYLES: list[tuple[str, str]] = [
     ("a)", "b)"),
     ("x.", "y."),
-    ("[i]", "[ii]"),
-    ("<1>", "<2>"),
+    # ("[i]", "[ii]"),
+    # ("<1>", "<2>"),
 ]
 # Additional styles for full variation grid - varied but natural formats
 MORE_LABEL_STYLES: list[tuple[str, str]] = [

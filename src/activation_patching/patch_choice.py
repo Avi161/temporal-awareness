@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from ..common.profiler import profile
 from .act_patch_results import ActPatchPairResult, ActPatchTargetResult
 from .intervened_choice import IntervenedChoice
 from ..binary_choice import BinaryChoiceRunner
@@ -22,9 +23,8 @@ def patch_for_choice(
 ) -> IntervenedChoice:
     """Run activation patching experiment.
 
-    Uses multilabel_choose to evaluate all label pairs in one forward pass.
-    Returns IntervenedChoice with GroupedBinaryChoice objects that contain
-    results for all label pairs.
+    Uses choose() for same-label pairs (faster), multilabel_choose() for
+    different labels. Returns IntervenedChoice with choice objects.
 
     Args:
         runner: BinaryChoiceRunner for model inference
@@ -36,12 +36,104 @@ def patch_for_choice(
         alpha: Interpolation strength (1.0 = full patch, 0.0 = no patch)
 
     Returns:
-        IntervenedChoice with GroupedBinaryChoice for baseline_clean,
-        baseline_corrupted, and intervened.
+        IntervenedChoice with baseline_clean, baseline_corrupted, and intervened.
     """
     component = target.component or "resid_post"
     names_filter = hook_filter_for_component(component)
 
+    # Use simpler choose() when labels are the same (faster path)
+    same_labels = pair.clean_labels == pair.corrupted_labels
+
+    if same_labels:
+        return _patch_for_choice_single_label(
+            runner, pair, target, mode, alpha, clear_memory, names_filter, component
+        )
+    else:
+        return _patch_for_choice_multilabel(
+            runner, pair, target, mode, alpha, clear_memory, names_filter, component
+        )
+
+
+@profile
+def _patch_for_choice_single_label(
+    runner: BinaryChoiceRunner,
+    pair: ContrastivePair,
+    target: InterventionTarget,
+    mode: PatchingMode,
+    alpha: float,
+    clear_memory: bool,
+    names_filter,
+    component: str,
+) -> IntervenedChoice:
+    """Fast path for same-label pairs using choose()."""
+    labels = pair.clean_labels  # same as corrupted_labels
+
+    # Get baseline choices
+    clean_choice = runner.choose(
+        pair.clean_prompt,
+        pair.choice_prefix,
+        labels,
+        with_cache=(mode == "denoising"),
+        names_filter=names_filter if mode == "denoising" else None,
+    )
+
+    corrupted_choice = runner.choose(
+        pair.corrupted_prompt,
+        pair.choice_prefix,
+        labels,
+        with_cache=(mode == "noising"),
+        names_filter=names_filter if mode == "noising" else None,
+    )
+
+    # Create intervention
+    intervention = pair.create_patching_intervention(
+        target, mode, clean_choice, corrupted_choice, alpha
+    )
+
+    if clear_memory:
+        clean_choice.pop_heavy()
+        corrupted_choice.pop_heavy()
+        clear_gpu_memory()
+
+    # Run with intervention
+    run_prompt = pair.corrupted_prompt if mode == "denoising" else pair.clean_prompt
+
+    final_layer_hook = hook_name(runner.n_layers - 1, "resid_post")
+    tcb_filter = hook_filter_exact(final_layer_hook)
+
+    intervened_choice = runner.choose(
+        run_prompt,
+        pair.choice_prefix,
+        labels,
+        intervention=intervention,
+        with_cache=True,
+        names_filter=tcb_filter,
+    )
+
+    if clear_memory:
+        intervened_choice.pop_heavy()
+        clear_gpu_memory()
+
+    return IntervenedChoice(
+        baseline_clean=clean_choice,
+        baseline_corrupted=corrupted_choice,
+        intervened=intervened_choice,
+        mode=mode,
+    )
+
+
+@profile
+def _patch_for_choice_multilabel(
+    runner: BinaryChoiceRunner,
+    pair: ContrastivePair,
+    target: InterventionTarget,
+    mode: PatchingMode,
+    alpha: float,
+    clear_memory: bool,
+    names_filter,
+    component: str,
+) -> IntervenedChoice:
+    """Multilabel path for different-label pairs using multilabel_choose()."""
     # Build label list: [clean_labels, corrupted_labels]
     all_labels = [pair.clean_labels, pair.corrupted_labels]
 
@@ -97,8 +189,6 @@ def patch_for_choice(
         intervened_grouped.pop_heavy()
         clear_gpu_memory()
 
-    # Store the full GroupedBinaryChoice objects
-    # Viz code can use .choices or .get_choice(i) to extract per-label results
     return IntervenedChoice(
         baseline_clean=clean_grouped,
         baseline_corrupted=corrupted_grouped,

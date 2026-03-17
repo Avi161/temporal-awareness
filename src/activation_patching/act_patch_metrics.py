@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import Literal
 
@@ -138,29 +139,43 @@ class IntervenedChoiceMetrics(BaseSchema):
         label_idx: int,
         label_perspective: LabelPerspective,
     ) -> IntervenedChoiceMetrics:
-        """Extract metrics for a specific label index."""
+        """Extract metrics for a specific label index.
+
+        For GroupedBinaryChoice (multilabel), accesses fork and trajectories directly
+        from the original tree rather than building subtrees via get_choice().
+        """
         from ..common.choice import GroupedBinaryChoice
 
-        # Extract baseline logit diff from the appropriate baseline
-        # Denoising runs corrupted, noising runs clean
-        baseline_logit_diff = 0.0
+        def _get_fork_logprobs(
+            bc: GroupedBinaryChoice | None, idx: int
+        ) -> tuple[float, float]:
+            """Get logprobs from fork at idx, or (0, 0) if unavailable."""
+            if bc is None or not bc.tree.forks or idx >= len(bc.tree.forks):
+                return (0.0, 0.0)
+            fork = bc.tree.forks[idx]
+            return (float(fork.next_token_logprobs[0]), float(fork.next_token_logprobs[1]))
+
+        # Determine if we're dealing with grouped (multilabel) choices
+        intervened = choice.intervened
         baseline = (
             choice.baseline_corrupted
             if choice.mode == "denoising"
             else choice.baseline_clean
         )
+
+        is_grouped = isinstance(intervened, GroupedBinaryChoice)
+        fork_idx = label_idx if is_grouped else 0
+
+        # Extract baseline logit diff
+        baseline_logit_diff = 0.0
         if baseline is not None:
-            if (
-                isinstance(baseline, GroupedBinaryChoice)
-                and label_idx < baseline.n_forks
-            ):
-                sub_choice = baseline.get_choice(label_idx)
-                orig_lps = sub_choice.divergent_logprobs
+            if isinstance(baseline, GroupedBinaryChoice) and label_idx < baseline.n_forks:
+                orig_lps = _get_fork_logprobs(baseline, label_idx)
             else:
                 orig_lps = baseline.divergent_logprobs
             baseline_logit_diff = orig_lps[0] - orig_lps[1]
 
-        # Compute effect based on mode (recovery for denoising, disruption for noising)
+        # Compute effect based on mode
         effect = choice.recovery if choice.mode == "denoising" else choice.disruption
 
         # Start with defaults
@@ -175,108 +190,90 @@ class IntervenedChoiceMetrics(BaseSchema):
             n_labels=choice.n_labels,
         )
 
-        # Get the intervened choice for this label
-        intervened = choice.intervened
         if intervened is None:
             return metrics
 
-        # Extract the specific label's choice if grouped
-        if (
-            isinstance(intervened, GroupedBinaryChoice)
-            and label_idx < intervened.n_forks
-        ):
-            sub_intervened = intervened.get_choice(label_idx)
-            tree = sub_intervened.tree
-        else:
-            sub_intervened = intervened
-            tree = intervened.tree
+        # Get tree and fork directly (no subtree construction)
+        tree = intervened.tree
+        if not tree.forks or fork_idx >= len(tree.forks):
+            return metrics
 
-        # Logprobs from divergent_logprobs (short=0, long=1)
-        lp_short, lp_long = sub_intervened.divergent_logprobs
+        fork = tree.forks[fork_idx]
+
+        # Logprobs directly from fork
+        lp_short, lp_long = float(fork.next_token_logprobs[0]), float(fork.next_token_logprobs[1])
         metrics.logprob_short = lp_short
         metrics.logprob_long = lp_long
         metrics.prob_short = math.exp(lp_short) if lp_short > -50 else 0.0
         metrics.prob_long = math.exp(lp_long) if lp_long > -50 else 0.0
         metrics.logit_diff = lp_short - lp_long
 
-        # ForkMetrics from tree.forks[0].analysis.metrics
-        # Gracefully handle missing tree/forks/analysis - skip fork metrics if unavailable
-        fork_metrics = None
-        if tree is not None and tree.forks and tree.forks[0].analysis is not None:
-            fork_metrics = tree.forks[0].analysis.metrics
-
-        if fork_metrics is not None:
+        # ForkMetrics from fork.analysis
+        if fork.analysis is not None:
+            fork_metrics = fork.analysis.metrics
             metrics.logit_diff = fork_metrics.logit_diff
-            # effect_logit_diff: target - source (positive = toward target)
             metrics.effect_logit_diff = (
                 metrics.logit_diff if metrics.mode == "denoising" else -metrics.logit_diff
             )
             metrics.fork_entropy = fork_metrics.fork_entropy
             metrics.fork_diversity = fork_metrics.fork_diversity
             metrics.fork_simpson = fork_metrics.fork_simpson
-            # reciprocal_rank_a is for the A token (short)
             metrics.reciprocal_rank_short = fork_metrics.reciprocal_rank_a
-            # For B token, it's the complement
             metrics.reciprocal_rank_long = 1.0 - fork_metrics.reciprocal_rank_a + 0.5
-            # effect_reciprocal_rank: short for denoising (target=clean), long for noising (target=corrupt)
             metrics.effect_reciprocal_rank = (
                 metrics.reciprocal_rank_short
                 if metrics.mode == "denoising"
                 else metrics.reciprocal_rank_long
             )
-            # Raw logits and normalized logits
             if fork_metrics.logits is not None:
                 metrics.logit_short, metrics.logit_long = fork_metrics.logits
             if fork_metrics.normalized_logits is not None:
-                metrics.norm_logit_short, metrics.norm_logit_long = (
-                    fork_metrics.normalized_logits
-                )
+                metrics.norm_logit_short, metrics.norm_logit_long = fork_metrics.normalized_logits
                 metrics.norm_logit_diff = metrics.norm_logit_short - metrics.norm_logit_long
-                # effect_norm_logit_diff: target - source (positive = toward target)
                 metrics.effect_norm_logit_diff = (
                     metrics.norm_logit_diff
                     if metrics.mode == "denoising"
                     else -metrics.norm_logit_diff
                 )
 
-        # Compute relative logit delta (change from baseline, normalized)
+        # Compute relative logit delta
         if abs(metrics.baseline_logit_diff) > 1e-6:
             metrics.rel_logit_delta = (
                 metrics.logit_diff - metrics.baseline_logit_diff
             ) / abs(metrics.baseline_logit_diff)
-            # effect_rel_logit_delta: target - source (positive = toward target)
             metrics.effect_rel_logit_delta = (
                 metrics.rel_logit_delta
                 if metrics.mode == "denoising"
                 else -metrics.rel_logit_delta
             )
 
-        # NodeMetrics from tree.nodes[0].analysis.metrics
-        if tree is not None and tree.nodes and tree.nodes[0].analysis:
+        # NodeMetrics from first node
+        if tree.nodes and tree.nodes[0].analysis:
             node_metrics = tree.nodes[0].analysis.metrics
             metrics.vocab_entropy = node_metrics.vocab_entropy
             metrics.vocab_diversity = node_metrics.vocab_diversity
             metrics.vocab_simpson = node_metrics.vocab_simpson
             metrics.vocab_tcb = node_metrics.vocab_tcb
 
-        # TrajectoryMetrics from chosen_traj.analysis.full_traj
-        chosen = sub_intervened.chosen_traj
-        if chosen and chosen.analysis and chosen.analysis.full_traj:
-            traj_metrics = chosen.analysis.full_traj
-            metrics.inv_perplexity = traj_metrics.inv_perplexity
+        # Trajectory metrics - get trajectories directly
+        # For grouped: trajs are [fork0_a, fork0_b, fork1_a, fork1_b, ...]
+        traj_idx_a = 2 * fork_idx if is_grouped else 0
+        traj_idx_b = 2 * fork_idx + 1 if is_grouped else 1
 
-        # Trajectory inv_perplexity from continuation_only (trajs[0]=A, trajs[1]=B)
-        if tree is not None and tree.trajs and len(tree.trajs) >= 2:
-            traj_a = tree.trajs[0]
-            traj_b = tree.trajs[1]
+        if tree.trajs and traj_idx_b < len(tree.trajs):
+            traj_a = tree.trajs[traj_idx_a]
+            traj_b = tree.trajs[traj_idx_b]
+
+            # Chosen trajectory based on logprob comparison
+            chosen_traj = traj_a if lp_short >= lp_long else traj_b
+            if chosen_traj.analysis and chosen_traj.analysis.full_traj:
+                metrics.inv_perplexity = chosen_traj.analysis.full_traj.inv_perplexity
+
+            # Per-trajectory inv_perplexity
             if traj_a.analysis and traj_a.analysis.continuation_only:
-                metrics.traj_inv_perplexity_short = (
-                    traj_a.analysis.continuation_only.inv_perplexity
-                )
+                metrics.traj_inv_perplexity_short = traj_a.analysis.continuation_only.inv_perplexity
             if traj_b.analysis and traj_b.analysis.continuation_only:
-                metrics.traj_inv_perplexity_long = (
-                    traj_b.analysis.continuation_only.inv_perplexity
-                )
+                metrics.traj_inv_perplexity_long = traj_b.analysis.continuation_only.inv_perplexity
 
         return metrics
 

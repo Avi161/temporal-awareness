@@ -135,7 +135,11 @@ def setup_column(
     if ylabel:  # Only set if not empty (allows pre-set colored labels)
         ax.set_ylabel(ylabel, fontsize=16, fontweight="bold")
     ax.tick_params(axis="both", labelsize=13)
+
+    # tick_positions already subsampled by get_tick_spacing() in sweep_plots.py
     ax.set_xticks(tick_positions)
+    ax.set_xticklabels([str(t) for t in tick_positions])
+
     if ylim:
         ax.set_ylim(ylim)
     setup_grid(ax)

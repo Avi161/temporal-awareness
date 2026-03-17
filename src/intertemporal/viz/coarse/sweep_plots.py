@@ -112,9 +112,10 @@ def _plot_sweep_row(
     secondary_axes.append(trajectory.plot(axes_row[5], x_values, metrics, tick_positions, xlabel))
 
     # Color x-axis ticks if coloring is provided (for position sweeps)
+    # Use tick_positions (already subsampled) not x_values to avoid overwriting
     if coloring:
         for ax in axes_row:
-            color_xaxis_ticks(ax, list(x_values), coloring)
+            color_xaxis_ticks(ax, list(tick_positions), coloring)
 
     return secondary_axes
 

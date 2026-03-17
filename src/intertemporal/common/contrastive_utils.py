@@ -26,7 +26,7 @@ class ContrastivePrefReq(BaseSchema):
     """
 
     # Label requirements (both False = no requirement, allows multilabel pairing)
-    same_labels: bool = True
+    same_labels: bool = False
     different_labels: bool = False
 
     # Reward requirements
