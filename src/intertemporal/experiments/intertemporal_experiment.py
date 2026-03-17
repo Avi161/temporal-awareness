@@ -20,6 +20,7 @@ from ..preference import generate_preference_data, load_and_merge_preference_dat
 from ..viz import (
     visualize_att_patching,
     visualize_coarse_patching,
+    visualize_component_comparison,
     visualize_fine_patching,
     visualize_tokenization,
 )
@@ -225,6 +226,17 @@ def step_visualize_results(
                     pair_out_dir,
                     position_labels,
                     section_markers,
+                )
+
+            # Multi-component comparison plots (when multiple components available)
+            results_by_component = {}
+            for component in components:
+                key = (pair_idx, component)
+                if key in ctx.coarse_patching:
+                    results_by_component[component] = ctx.coarse_patching[key]
+            if len(results_by_component) > 1:
+                visualize_component_comparison(
+                    results_by_component, pair_out_dir / "component_comparison"
                 )
     else:
         log("[viz] No per-pair results to visualize")

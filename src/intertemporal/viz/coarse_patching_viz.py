@@ -25,6 +25,7 @@ from ...common.contrastive_pair import ContrastivePair
 from ...viz.token_coloring import PairTokenColoring
 from .coarse.aggregated import plot_aggregated_structured
 from .coarse.comparison import plot_comparison
+from .coarse.component_comparison import plot_all_component_comparisons
 from .coarse.redundancy import plot_redundancy
 from .coarse.sanity import plot_sanity_check
 from .coarse.sweep_plots import plot_layer_sweep, plot_position_sweep
@@ -96,3 +97,34 @@ def visualize_coarse_patching(
         plot_sanity_check(result, output_dir, coloring, pair, component)
 
     print(f"[viz] Coarse patching plots saved to {output_dir}")
+
+
+@profile
+def visualize_component_comparison(
+    results_by_component: dict[str, CoarseActPatchResults],
+    output_dir: Path,
+    step_size: int = 1,
+) -> None:
+    """Visualize multi-component comparison plots.
+
+    Creates comparison plots across all available components:
+    - Component attribution heatmaps (layers and positions)
+    - Marginal contribution plots
+    - Attention vs MLP scatter plots
+    - Cumulative recovery plots
+    - Redundancy gap analysis
+    - And more...
+
+    Args:
+        results_by_component: Dict mapping component name to its results
+        output_dir: Directory to save plots
+        step_size: Step size to use for data extraction
+    """
+    if not results_by_component:
+        print("[viz] No component results for comparison plots")
+        return
+
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    plot_all_component_comparisons(results_by_component, output_dir, step_size)
