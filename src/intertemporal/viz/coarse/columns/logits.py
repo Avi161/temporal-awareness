@@ -124,13 +124,14 @@ def plot(
     ax_right.tick_params(axis="y", labelsize=13)
     ax_right.axhline(y=0, color="gray", linestyle="--", alpha=0.5, linewidth=1)
 
-    # Auto-scale y-axis to show rel_logit_delta variation
-    if rel_logit_deltas:
-        rld_min, rld_max = min(rel_logit_deltas), max(rel_logit_deltas)
-        rld_range = rld_max - rld_min
-        if rld_range > 0:
-            padding = rld_range * 0.2
-            ax_right.set_ylim(rld_min - padding, rld_max + padding)
+    # Auto-scale y-axis to include all right-axis data
+    all_right_values = rel_logit_deltas + norm_logit_shorts + norm_logit_longs
+    if all_right_values:
+        v_min, v_max = min(all_right_values), max(all_right_values)
+        v_range = v_max - v_min
+        if v_range > 0:
+            padding = v_range * 0.1
+            ax_right.set_ylim(v_min - padding, v_max + padding)
 
     add_dual_axis_legend(ax, ax_right)
 
