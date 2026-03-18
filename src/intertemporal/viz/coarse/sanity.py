@@ -24,6 +24,7 @@ def plot_sanity_check(
     output_dir: Path,
     coloring: PairTokenColoring | None = None,
     pair: ContrastivePair | None = None,
+    component: str = "resid_post",
 ) -> None:
     """Plot sanity check results.
 
@@ -38,6 +39,7 @@ def plot_sanity_check(
         output_dir: Directory to save output
         coloring: Token coloring (unused, kept for API compatibility)
         pair: ContrastivePair for per-position logprob plot
+        component: Component being patched (for plot title)
     """
     sanity = result.sanity_result
     if sanity is None:
@@ -46,7 +48,7 @@ def plot_sanity_check(
 
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
     fig.suptitle(
-        "Sanity Check: Full Patching (All Layers + All Positions)",
+        f"Sanity Check [{component}]: Full Patching (All Layers + All Positions)",
         fontsize=14,
         fontweight="bold",
     )
@@ -83,59 +85,128 @@ def _plot_greedy_results(
     d_metrics: IntervenedChoiceMetrics | None,
     n_metrics: IntervenedChoiceMetrics | None,
 ) -> None:
-    """Plot greedy generation results as text."""
+    """Plot greedy generation results as styled cards."""
     ax.axis("off")
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
 
-    lines = ["GREEDY GENERATION RESULTS", "=" * 50, ""]
-    lines.append("Patching ALL layers + ALL positions at once:")
-    lines.append("")
+    y_pos = 0.95
 
+    # Title
+    ax.text(
+        0.5, y_pos, "Greedy Generation Results",
+        transform=ax.transAxes, fontsize=14, fontweight="bold",
+        ha="center", va="top"
+    )
+    y_pos -= 0.08
+
+    # Denoising card
     if sanity.denoising:
         d = sanity.denoising
-        orig_label, intv_label, orig_response = _extract_labels(d, "denoising")
-        flip_marker = "FLIPPED" if orig_label != intv_label else "(no flip)"
-        lines.extend(
-            [
-                "DENOISING (corrupt->clean):",
-                f"  Original greedy: '{orig_label}'  {flip_marker}",
-                f"  After patch:     '{intv_label}'",
-                f"  Recovery: {d.recovery:.4f}",
-            ]
+        orig_label, intv_label, _ = _extract_labels(d, "denoising")
+        flipped = orig_label != intv_label
+        y_pos = _draw_mode_card(
+            ax, y_pos, "DENOISING", "corrupt → clean",
+            orig_label, intv_label, d.recovery, "Recovery", flipped,
+            card_color="#E8F5E9", border_color="#4CAF50"
         )
-        if orig_response:
-            lines.append(f"  Response: '{orig_response[:40]}...'")
-        lines.append("")
 
+    # Noising card
     if sanity.noising:
         n = sanity.noising
-        orig_label, intv_label, orig_response = _extract_labels(n, "noising")
-        flip_marker = "FLIPPED" if orig_label != intv_label else "(no flip)"
-        lines.extend(
-            [
-                "NOISING (clean->corrupt):",
-                f"  Original greedy: '{orig_label}'  {flip_marker}",
-                f"  After patch:     '{intv_label}'",
-                f"  Recovery: {n.recovery:.4f}",
-            ]
+        orig_label, intv_label, _ = _extract_labels(n, "noising")
+        flipped = orig_label != intv_label
+        y_pos = _draw_mode_card(
+            ax, y_pos, "NOISING", "clean → corrupt",
+            orig_label, intv_label, n.disruption, "Disruption", flipped,
+            card_color="#FFEBEE", border_color="#F44336"
         )
-        if orig_response:
-            lines.append(f"  Response: '{orig_response[:40]}...'")
 
-    # Combined sanity score
-    lines.extend(["", "-" * 45, f"Combined Sanity Score: {sanity.score():.4f}"])
-    if sanity.flip_count > 0:
-        lines.append(f"Flips: {sanity.flip_count}/2")
-
+    # Combined score box
+    score = sanity.score()
+    score_color = "#4CAF50" if score > 0.8 else "#FF9800" if score > 0.5 else "#F44336"
+    ax.add_patch(plt.Rectangle(
+        (0.1, y_pos - 0.12), 0.8, 0.1,
+        transform=ax.transAxes, facecolor="#F5F5F5",
+        edgecolor=score_color, linewidth=2, clip_on=False
+    ))
     ax.text(
-        0.02,
-        0.98,
-        "\n".join(lines),
-        transform=ax.transAxes,
-        fontsize=10,
-        fontfamily="monospace",
-        verticalalignment="top",
-        bbox=dict(boxstyle="round", facecolor="white", edgecolor="gray", alpha=0.9),
+        0.5, y_pos - 0.07,
+        f"Sanity Score: {score:.2f}  |  Flips: {sanity.flip_count}/2",
+        transform=ax.transAxes, fontsize=12, fontweight="bold",
+        ha="center", va="center", color=score_color
     )
+
+
+def _draw_mode_card(
+    ax: plt.Axes, y_top: float, mode_name: str, direction: str,
+    orig_label: str, intv_label: str, metric_val: float, metric_name: str,
+    flipped: bool, card_color: str, border_color: str
+) -> float:
+    """Draw a styled card for denoising/noising results. Returns new y position."""
+    card_height = 0.22
+    y_bottom = y_top - card_height
+
+    # Card background
+    ax.add_patch(plt.Rectangle(
+        (0.05, y_bottom), 0.9, card_height - 0.02,
+        transform=ax.transAxes, facecolor=card_color,
+        edgecolor=border_color, linewidth=1.5, clip_on=False
+    ))
+
+    # Mode header
+    ax.text(
+        0.1, y_top - 0.04, f"{mode_name}",
+        transform=ax.transAxes, fontsize=11, fontweight="bold", color=border_color
+    )
+    ax.text(
+        0.35, y_top - 0.04, f"({direction})",
+        transform=ax.transAxes, fontsize=10, color="#666666"
+    )
+
+    # Flip indicator
+    if flipped:
+        ax.text(
+            0.85, y_top - 0.04, "FLIPPED",
+            transform=ax.transAxes, fontsize=9, fontweight="bold",
+            color="white", ha="center", va="center",
+            bbox=dict(boxstyle="round,pad=0.2", facecolor="#4CAF50", edgecolor="none")
+        )
+
+    # Original → After
+    ax.text(
+        0.1, y_top - 0.10, "Original:",
+        transform=ax.transAxes, fontsize=10, color="#555555"
+    )
+    ax.text(
+        0.28, y_top - 0.10, f"'{orig_label}'",
+        transform=ax.transAxes, fontsize=11, fontweight="bold", fontfamily="monospace"
+    )
+    ax.text(
+        0.5, y_top - 0.10, "→",
+        transform=ax.transAxes, fontsize=12, ha="center"
+    )
+    ax.text(
+        0.55, y_top - 0.10, "After:",
+        transform=ax.transAxes, fontsize=10, color="#555555"
+    )
+    ax.text(
+        0.70, y_top - 0.10, f"'{intv_label}'",
+        transform=ax.transAxes, fontsize=11, fontweight="bold", fontfamily="monospace"
+    )
+
+    # Metric value
+    ax.text(
+        0.1, y_top - 0.17, f"{metric_name}:",
+        transform=ax.transAxes, fontsize=10, color="#555555"
+    )
+    metric_color = "#4CAF50" if metric_val > 0.8 else "#FF9800" if metric_val > 0.5 else "#F44336"
+    ax.text(
+        0.28, y_top - 0.17, f"{metric_val:.4f}",
+        transform=ax.transAxes, fontsize=12, fontweight="bold", color=metric_color
+    )
+
+    return y_bottom - 0.02
 
 
 def _extract_labels(choice, mode: str) -> tuple[str, str, str]:
@@ -179,7 +250,7 @@ def _plot_probability_bars(
         ax.axis("off")
         return
 
-    metrics_names = ["prob(short)", "prob(long)", "fork_div", "recovery"]
+    metrics_names = ["prob(short)", "prob(long)", "fork_div", "recov/disrupt"]
     x = np.arange(len(metrics_names))
     width = 0.35
 
@@ -198,7 +269,7 @@ def _plot_probability_bars(
             n_metrics.prob_short,
             n_metrics.prob_long,
             n_metrics.fork_diversity,
-            n_metrics.recovery,
+            n_metrics.disruption,
         ]
         if n_metrics
         else [0, 0, 0, 0]

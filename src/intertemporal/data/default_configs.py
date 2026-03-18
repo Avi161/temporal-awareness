@@ -4,6 +4,7 @@ from __future__ import annotations
 
 # Default model for experiments
 DEFAULT_MODEL = "Qwen/Qwen3-4B-Instruct-2507"
+# DEFAULT_MODEL = "Qwen/Qwen3.5-9B"
 
 MINIMAL_PROMPT_DATASET_CONFIG = {
     "name": "default_test",
@@ -37,32 +38,14 @@ MINIMAL_PROMPT_DATASET_CONFIG = {
         {"value": 1, "unit": "months"},  # Short horizon
         {"value": 50, "unit": "years"},  # Long horizon
     ],
-    "add_formatting_variations": False,
-    "do_variation_grid": False,
+    "add_formatting_noise": False,
+    "do_formatting_variation_grid": False,
 }
 
 # Small config for testing
 MINIMAL_EXPERIMENT_CONFIG = {
     "model": DEFAULT_MODEL,
     "dataset_config": MINIMAL_PROMPT_DATASET_CONFIG,
-    "attribution_patching_config": {
-        "n_pairs": 1,
-        "target": {
-            "methods": ["standard"],  # Fast mode
-            "layers": "all",
-        },
-    },
-    "activation_patching_config": {
-        "n_pairs": 1,
-        "target": {
-            "position_mode": "all",
-            "layers": "all",  # All layers together for full causal effect
-        },
-        "mode": "both",  # Run both noising and denoising for comparison
-        "verify_with_greedy": True,
-    },
-    "use_attribution_targets": False,
-    "n_attribution_targets": 10,  # Only used if use_attribution_targets=True
 }
 
 # Default prompt dataset config
@@ -103,7 +86,7 @@ DEFAULT_PROMPT_DATASET_CONFIG = {
         {"value": 30, "unit": "years"},
         {"value": 50, "unit": "years"},
     ],
-    "add_formatting_variations": True,
+    "add_formatting_noise": False,
 }
 
 # Normal config for real experiments

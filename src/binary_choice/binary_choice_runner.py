@@ -56,48 +56,50 @@ class BinaryChoiceRunner(ModelRunner):
         Returns:
             LabeledSimpleBinaryChoice with the tree, decision, and metadata.
         """
-
-        prompt = self.apply_chat_template(prompt)
-        prompt_ids = self.encode_ids(prompt, add_special_tokens=True)
+        templated_prompt = self.apply_chat_template(prompt)
+        prompt_ids = self.encode_ids(templated_prompt, add_special_tokens=True)
 
         # Auto-prepend skip thinking prefix for reasoning models
         effective_prefix = self.skip_thinking_prefix + choice_prefix
 
         response_text_a = effective_prefix + labels[0]
         response_text_b = effective_prefix + labels[1]
-        token_ids_a = encode_into_trajectory_ids(self, prompt, response_text_a)
-        token_ids_b = encode_into_trajectory_ids(self, prompt, response_text_b)
 
-        # ── Inference ────────────────────────────────────────────────────
+        # ── Trajectory computation ──────────────────────────────────────
 
-        traj_a, traj_b = self._run_pair(
-            token_ids_a,
-            token_ids_b,
-            intervention=intervention,
-            with_cache=with_cache,
-            names_filter=names_filter,
-            past_kv_cache=past_kv_cache,
-        )
+        if self.is_cloud_api:
+            # Cloud API: backend handles choice directly with semantic context
+            traj_a, traj_b = self._backend.compute_binary_choice_trajectories(
+                prompt, labels, choice_prefix
+            )
+        else:
+            # Local model: encode and run forward pass
+            token_ids_a = encode_into_trajectory_ids(
+                self, templated_prompt, response_text_a
+            )
+            token_ids_b = encode_into_trajectory_ids(
+                self, templated_prompt, response_text_b
+            )
+            traj_a, traj_b = self._run_pair(
+                token_ids_a,
+                token_ids_b,
+                intervention=intervention,
+                with_cache=with_cache,
+                names_filter=names_filter,
+                past_kv_cache=past_kv_cache,
+            )
 
         # ── Assemble result ──────────────────────────────────────────────
 
-        # Get W_U and b_U for TCB computation if available
-        try:
-            W_U = self.W_U
-            b_U = self.b_U
-        except (NotImplementedError, AttributeError):
-            W_U = None
-            b_U = None
-
-        return LabeledSimpleBinaryChoice.from_trajectories(
+        choice = LabeledSimpleBinaryChoice.from_trajectories(
             traj_a,
             traj_b,
             labels=labels,
             response_texts=(response_text_a, response_text_b),
             trunk=prompt_ids,
-            W_U=W_U,
-            b_U=b_U,
         )
+        analyze_token_tree(choice.tree, W_U=self.W_U, b_U=self.b_U)
+        return choice
 
     # ══════════════════════════════════════════════════════════════════════
     #  Batch API
@@ -169,14 +171,6 @@ class BinaryChoiceRunner(ModelRunner):
 
         # ── Assemble results ─────────────────────────────────────────────
 
-        # Get W_U and b_U for TCB computation if available
-        try:
-            W_U = self.W_U
-            b_U = self.b_U
-        except (NotImplementedError, AttributeError):
-            W_U = None
-            b_U = None
-
         results: list[LabeledSimpleBinaryChoice] = []
         for i in range(n):
             choice = LabeledSimpleBinaryChoice.from_trajectories(
@@ -185,9 +179,8 @@ class BinaryChoiceRunner(ModelRunner):
                 labels=labels[i],
                 response_texts=(response_texts_a[i], response_texts_b[i]),
                 trunk=prompt_ids_list[i],
-                W_U=W_U,
-                b_U=b_U,
             )
+            analyze_token_tree(choice.tree, W_U=self.W_U, b_U=self.b_U)
             results.append(choice)
         return results
 
@@ -321,7 +314,7 @@ class BinaryChoiceRunner(ModelRunner):
             fork_arms=fork_arms,
             trunk=prompt_ids,
         )
-        analyze_token_tree(tree)
+        analyze_token_tree(tree, W_U=self.W_U, b_U=self.b_U)
 
         # ── Assemble result ──────────────────────────────────────────────
 

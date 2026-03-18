@@ -22,10 +22,11 @@ def plot_comparison(
     output_dir: Path,
     coloring: PairTokenColoring | None = None,
     step_size: int = 8,
+    component: str = "resid_post",
 ) -> None:
     """Plot denoising vs noising comparison scatter plots.
 
-    Creates a 1x2 figure with layer comparison (left) and position comparison (right).
+    Creates single-panel or two-panel figure depending on available data.
 
     Args:
         layer_data: Layer sweep results
@@ -33,19 +34,34 @@ def plot_comparison(
         output_dir: Directory to save output
         coloring: Token coloring for position colors
         step_size: Step size used in the sweep
+        component: Component being patched (for plot title)
     """
-    fig, axes = plt.subplots(1, 2, figsize=(18, 8), facecolor="white")
+    has_layer = bool(layer_data)
+    has_position = bool(position_data)
+
+    if not has_layer and not has_position:
+        return
+
+    # Determine layout based on available data
+    if has_layer and has_position:
+        fig, axes = plt.subplots(1, 2, figsize=(18, 8), facecolor="white")
+        _plot_layer_comparison(axes[0], layer_data)
+        _plot_position_comparison(axes[1], position_data, coloring)
+        title_suffix = f"(step={step_size})"
+    elif has_layer:
+        fig, ax = plt.subplots(figsize=(10, 8), facecolor="white")
+        _plot_layer_comparison(ax, layer_data)
+        title_suffix = f"Layer Sweep (step={step_size})"
+    else:
+        fig, ax = plt.subplots(figsize=(10, 8), facecolor="white")
+        _plot_position_comparison(ax, position_data, coloring)
+        title_suffix = f"Position Sweep (step={step_size})"
+
     fig.suptitle(
-        f"Activation Patching: Denoising vs Noising Recovery (step size={step_size})",
-        fontsize=20,
+        f"Activation Patching [{component}]: Denoising vs Noising {title_suffix}",
+        fontsize=18,
         fontweight="bold",
     )
-
-    # Layer comparison
-    _plot_layer_comparison(axes[0], layer_data)
-
-    # Position comparison
-    _plot_position_comparison(axes[1], position_data, coloring)
 
     # Save
     plt.tight_layout(rect=[0, 0, 1, 0.95])
@@ -69,19 +85,22 @@ def _plot_layer_comparison(
         return
 
     layers = sorted(layer_data.keys())
-    recoveries = [layer_data[l].recovery for l in layers]
-    disruptions = [layer_data[l].disruption for l in layers]
+    recoveries = [layer_data[lyr].recovery for lyr in layers]
+    disruptions = [layer_data[lyr].disruption for lyr in layers]
 
     # Viridis colormap for layers
     colors = plt.cm.viridis(np.linspace(0, 1, len(layers)))
 
-    # Find extreme points to label
+    # Build label indices: extreme points + evenly spaced
     label_indices = _get_extreme_indices(recoveries, disruptions, n_top=5)
     label_indices.add(0)  # First layer
     label_indices.add(len(layers) - 1)  # Last layer
+    label_indices |= _get_evenly_spaced_indices(len(layers), n_labels=8)
 
-    # Plot points
+    # Plot points (skip if either value is None)
     for i, (rec, dis, layer) in enumerate(zip(recoveries, disruptions, layers)):
+        if rec is None or dis is None:
+            continue
         ax.scatter(
             rec,
             dis,
@@ -116,11 +135,16 @@ def _plot_position_comparison(
     disruptions = [position_data[p].disruption for p in positions]
     point_colors = [get_tick_color(p, coloring) for p in positions]
 
-    # Find extreme points to label (top 3 to reduce clutter)
-    label_indices = _get_extreme_indices(recoveries, disruptions, n_top=3)
+    # Build label indices: extreme points + evenly spaced
+    label_indices = _get_extreme_indices(recoveries, disruptions, n_top=5)
+    label_indices.add(0)  # First position
+    label_indices.add(len(positions) - 1)  # Last position
+    label_indices |= _get_evenly_spaced_indices(len(positions), n_labels=10)
 
-    # Plot points
+    # Plot points (skip if either value is None)
     for i, (rec, dis, pos) in enumerate(zip(recoveries, disruptions, positions)):
+        if rec is None or dis is None:
+            continue
         ax.scatter(
             rec,
             dis,
@@ -138,16 +162,31 @@ def _plot_position_comparison(
 
 
 def _get_extreme_indices(
-    recoveries: list[float],
-    disruptions: list[float],
+    recoveries: list[float | None],
+    disruptions: list[float | None],
     n_top: int = 5,
 ) -> set[int]:
-    """Get indices of extreme points in recovery and disruption."""
-    rec_arr = np.array(recoveries)
-    dis_arr = np.array(disruptions)
+    """Get indices of extreme points in recovery and disruption.
+
+    Handles None values by treating them as -inf for sorting purposes.
+    """
+    # Replace None with -inf so they sort to the end (we want highest values)
+    rec_arr = np.array([r if r is not None else -np.inf for r in recoveries])
+    dis_arr = np.array([d if d is not None else -np.inf for d in disruptions])
     rec_sorted_idx = np.argsort(rec_arr)[::-1][:n_top]
     dis_sorted_idx = np.argsort(dis_arr)[::-1][:n_top]
     return set(rec_sorted_idx) | set(dis_sorted_idx)
+
+
+def _get_evenly_spaced_indices(n_total: int, n_labels: int = 8) -> set[int]:
+    """Get evenly spaced indices for labeling.
+
+    Distributes labels evenly across the index range.
+    """
+    if n_total <= n_labels:
+        return set(range(n_total))
+    step = (n_total - 1) / (n_labels - 1)
+    return {int(round(i * step)) for i in range(n_labels)}
 
 
 def _add_point_label(ax: plt.Axes, x: float, y: float, label: str) -> None:
@@ -172,6 +211,20 @@ def _add_point_label(ax: plt.Axes, x: float, y: float, label: str) -> None:
 
 def _setup_comparison_axes(ax: plt.Axes, title: str) -> None:
     """Configure axes for comparison scatter plot."""
+    # Add faint background region labels (before other elements)
+    # "AND" above x=y line: both denoising and noising have strong effect
+    ax.text(
+        0.25, 0.75, "AND",
+        fontsize=48, fontweight="bold", color="gray", alpha=0.15,
+        ha="center", va="center", zorder=0,
+    )
+    # "OR" below x=y line: one or the other has effect
+    ax.text(
+        0.75, 0.25, "OR",
+        fontsize=48, fontweight="bold", color="gray", alpha=0.15,
+        ha="center", va="center", zorder=0,
+    )
+
     ax.plot([0, 1], [0, 1], "k--", alpha=0.7, linewidth=2.5, label="Equal effect (y=x)")
     ax.set_xlabel("Recovery (Denoising)", fontsize=14, fontweight="bold")
     ax.set_ylabel("Disruption (Noising)", fontsize=14, fontweight="bold")

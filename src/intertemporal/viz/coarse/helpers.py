@@ -24,19 +24,29 @@ def setup_grid(ax: plt.Axes) -> None:
     ax.set_axisbelow(True)
 
 
-def get_tick_spacing(n_points: int) -> int:
-    """Return tick spacing to keep x-axis legible."""
-    if n_points <= 10:
+def get_tick_spacing(n_points: int, max_ticks: int = 15) -> int:
+    """Return tick spacing to keep x-axis legible.
+
+    Adaptively computes spacing to show at most max_ticks labels.
+    """
+    if n_points <= max_ticks:
         return 1
-    elif n_points <= 20:
+    # Compute spacing to get ~max_ticks labels
+    spacing = (n_points + max_ticks - 1) // max_ticks
+    # Round up to nice numbers for readability
+    if spacing <= 2:
         return 2
-    elif n_points <= 35:
-        return 4
-    elif n_points <= 50:
+    elif spacing <= 5:
         return 5
-    elif n_points <= 80:
-        return 8
-    return 10
+    elif spacing <= 10:
+        return 10
+    elif spacing <= 20:
+        return 20
+    elif spacing <= 25:
+        return 25
+    elif spacing <= 50:
+        return 50
+    return 100
 
 
 def get_tick_color(pos: int, coloring: PairTokenColoring | None) -> str:

@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from ...common.file_io import load_json
+from ...common.logging import log, log_kv
 from ...inference import InternalsConfig, CapturedInternals
 from ..common.preference_types import PreferenceSample
 from ...inference.interventions import (
@@ -16,6 +17,7 @@ from ...inference.interventions import (
 )
 from ...binary_choice.binary_choice_runner import BinaryChoiceRunner
 from ...binary_choice.choice_utils import verify_greedy_generation
+from ...common.device_utils import clear_gpu_memory, ProgressTracker
 from .preference_dataset import PreferenceDataset
 from ..prompt import PromptDataset
 
@@ -133,20 +135,24 @@ class PreferenceQuerier:
         intervention = self._load_intervention(runner)
 
         if intervention:
-            print(
-                f"query_dataset: Using intervention: mode={intervention.mode} at layer {intervention.layer}"
+            log(
+                f"[query] Using intervention: mode={intervention.mode} at layer {intervention.layer}"
             )
         if activation_names:
-            print(f"query_dataset: Capturing activations/internals {activation_names}")
+            log(f"[query] Capturing activations/internals {activation_names}")
 
         # Get choice_prefix from dataset config
         choice_prefix = prompt_dataset.config.prompt_format_config.get_response_prefix_before_choice()
 
-        print(f"query_dataset: Querying LLM for {len(samples)} samples...")
+        log(f"[query] Querying LLM for {len(samples)} samples...")
         preferences = []
+        tracker = ProgressTracker(
+            total=len(samples),
+            progress_every=10,
+            memory_every=50,
+        )
         for i, sample in enumerate(samples):
-            if (i + 1) % 10 == 0:
-                print(f"  {i + 1}/{len(samples)}")
+            tracker.step(i)
 
             sample_idx = sample.sample_idx
             time_horizon = (
@@ -219,6 +225,10 @@ class PreferenceQuerier:
                 (choice_idx == associated) if associated is not None else None
             )
 
+            # Clear heavy data from choice tree before storing
+            choice.pop_heavy()
+            clear_gpu_memory()
+
             preferences.append(
                 PreferenceSample(
                     # Choice
@@ -241,6 +251,7 @@ class PreferenceQuerier:
                     internals_paths=None,
                     decoding_mismatch=decoding_mismatch,
                     formatting_id=sample.formatting_id,
+                    context_id=sample.context_id,
                     matches_rational=matches_rational,
                     matches_associated=matches_associated,
                 )
