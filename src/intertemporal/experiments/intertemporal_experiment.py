@@ -259,6 +259,7 @@ def run_experiment(
     cfg: ExperimentConfig,
     try_loading_data: bool = False,
     output_dir: Path | None = None,
+    backend: str | None = None,
 ) -> ExperimentContext:
     """Run full experiment.
 
@@ -266,8 +267,9 @@ def run_experiment(
         cfg: Experiment configuration
         try_loading_data: If True, try loading cached data before recomputing
         output_dir: Optional custom output directory (overrides default)
+        backend: Optional backend override (pyvene, transformerlens, huggingface, nnsight)
     """
-    ctx = ExperimentContext(cfg, output_dir=output_dir)
+    ctx = ExperimentContext(cfg, output_dir=output_dir, backend=backend)
 
     step_preference_data(ctx, try_loading_data=try_loading_data)
 

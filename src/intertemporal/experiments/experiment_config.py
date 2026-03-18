@@ -13,7 +13,21 @@ from ..prompt import PromptDatasetConfig
 COARSE_PATCH: dict = {
     "layer_steps": [1],
     "pos_steps": [1],
-    "components": ["resid_post"],
+    "components": ["resid_pre", "resid_post", "attn_out", "mlp_out"],
+}
+
+# Default attribution patching settings (empty dict = skip)
+# methods: "standard", "eap", "eap_ig"
+# components: "resid_post", "attn_out", "mlp_out"
+# grad_at: ["clean"], ["corrupted"], or ["clean", "corrupted"]
+# quadrature: ["midpoint"], ["gauss-legendre"], ["gauss-chebyshev"], or combinations
+ATT_PATCH: dict = {
+    "enabled": False,
+    "methods": ["standard", "eap", "eap_ig"],
+    "components": ["resid_post", "attn_out", "mlp_out"],
+    "ig_steps": [20],
+    "grad_at": ["clean", "corrupted"],
+    "quadrature": ["midpoint", "gauss-legendre", "gauss-chebyshev"],
 }
 
 
@@ -29,6 +43,9 @@ class ExperimentConfig(BaseSchema):
 
     # Coarse patching settings
     coarse_patch: dict = field(default_factory=lambda: COARSE_PATCH.copy())
+
+    # Attribution patching settings
+    att_patch: dict = field(default_factory=lambda: ATT_PATCH.copy())
 
     @property
     def name(self) -> str:

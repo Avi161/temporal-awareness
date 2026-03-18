@@ -15,6 +15,7 @@ from ...inference import (
     get_recommended_backend_internals,
     InterventionTarget,
 )
+from ...inference.backends import ModelBackend
 from ...binary_choice import BinaryChoiceRunner
 from ...activation_patching import (
     ActPatchAggregatedResult,
@@ -43,6 +44,9 @@ class ExperimentContext:
     output_dir: Path | None = field(default=None)
     timestamp: str = field(default_factory=get_timestamp)
 
+    # Backend override (None = auto-detect via get_recommended_backend_internals)
+    backend: str | None = None
+
     def __post_init__(self) -> None:
         if self.output_dir is None:
             self.output_dir = get_experiment_dir() / self.cfg.get_id()
@@ -69,7 +73,11 @@ class ExperimentContext:
     def runner(self) -> BinaryChoiceRunner:
         """Cached runner for this experiment."""
         if self._runner is None:
-            backend = get_recommended_backend_internals()
+            # Use backend override if provided, otherwise auto-detect
+            if self.backend:
+                backend = ModelBackend(self.backend)
+            else:
+                backend = get_recommended_backend_internals()
             self._runner = BinaryChoiceRunner(
                 self.pref_data.model, device=get_device(), backend=backend
             )
