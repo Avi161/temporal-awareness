@@ -7,7 +7,7 @@ from typing import Literal
 import numpy as np
 
 from ..common.patching_types import PatchingMode
-from ..common.profiler import profiled
+from ..common.profiler import profile
 from .attribution_metric import AttributionMetric
 from .attribution_settings import AttributionSettings
 from .attribution_results import (
@@ -64,7 +64,7 @@ def _build_results(
     return results
 
 
-@profiled
+@profile
 def attribute_for_choice(
     runner: BinaryChoiceRunner,
     pair: ContrastivePair,
@@ -105,7 +105,7 @@ def attribute_for_choice(
     return AttributionSummary(results=results, n_pairs=1, mode=mode)
 
 
-@profiled
+@profile
 def attribute_pair(
     runner: BinaryChoiceRunner,
     pair: ContrastivePair,

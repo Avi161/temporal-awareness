@@ -12,7 +12,7 @@ import torch
 
 from ..common.contrastive_pair import ContrastivePair
 from ..common.hook_utils import attribution_filter, hook_name
-from ..common.profiler import P, profiled
+from ..common.profiler import P, profile
 from ..common.patching_types import GradTarget, PatchingMode
 from ..inference.interventions import interpolate_embeddings
 
@@ -55,7 +55,7 @@ def _compute_edge_attribution(
     return torch.sum((c - r) * g).detach().cpu().item()
 
 
-@profiled
+@profile
 def compute_eap_ig(
     runner: "BinaryChoiceRunner",
     pair: ContrastivePair,
