@@ -44,6 +44,19 @@ from src.intertemporal.data.default_configs import (
     FULL_EXPERIMENT_CONFIG,
     MINIMAL_EXPERIMENT_CONFIG,
 )
+from src.intertemporal.viz.coarse.component_comparison.constants import COMPONENTS
+
+
+def detect_cached_components(exp_dir: Path) -> list[str]:
+    """Detect which components have cached coarse patching results."""
+    cached = []
+    pair_0 = exp_dir / "pair_0"
+    if not pair_0.exists():
+        return cached
+    for comp in COMPONENTS:
+        if (pair_0 / f"sweep_{comp}" / "coarse_results.json").exists():
+            cached.append(comp)
+    return cached
 
 
 def parse_args() -> argparse.Namespace:
@@ -101,8 +114,6 @@ def main() -> int:
             config_dict["coarse_patch"] = {}
         config_dict["coarse_patch"].update(coarse_overrides)
 
-    exp_cfg = ExperimentConfig.from_dict(config_dict)
-
     # Determine output directory
     output_dir = None
     try_loading_data = bool(args.cache)
@@ -110,12 +121,23 @@ def main() -> int:
     if args.cache and isinstance(args.cache, str):
         # --cache FOLDER: load from specific folder
         output_dir = get_experiment_dir() / args.cache
+
+        # Auto-detect cached components
+        cached = detect_cached_components(output_dir)
+        if cached:
+            if "coarse_patch" not in config_dict:
+                config_dict["coarse_patch"] = {}
+            config_dict["coarse_patch"]["components"] = cached
+            print(f"Auto-detected cached components: {cached}")
     elif args.rename:
         if args.cache:
             print("Warning: --rename is ignored when --cache is used")
         else:
             # --rename NAME: use custom folder name
             output_dir = get_experiment_dir() / args.rename
+
+    # Create experiment config after all config modifications
+    exp_cfg = ExperimentConfig.from_dict(config_dict)
 
     # If no custom output_dir, use default based on config ID
     if output_dir is None:

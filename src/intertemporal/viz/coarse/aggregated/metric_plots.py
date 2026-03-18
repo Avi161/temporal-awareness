@@ -78,31 +78,19 @@ def plot_column(
         # Get color for this metric
         color = get_metric_color(metric_series.metric_name)
 
-        # Compute min/max at each x for spread visualization
-        n_points = len(x_values)
-        min_vals = []
-        max_vals = []
-        for x_idx in range(n_points):
+        # Compute min/max and valid spread in single pass
+        valid_spread_x = []
+        valid_min = []
+        valid_max = []
+        for x_idx, x in enumerate(x_values):
             values = [
                 s[x_idx] for s in metric_series.per_pair_series
                 if s[x_idx] is not None
             ]
             if values:
-                min_vals.append(min(values))
-                max_vals.append(max(values))
-            else:
-                min_vals.append(None)
-                max_vals.append(None)
-
-        # Plot spread as filled region
-        valid_spread_x = []
-        valid_min = []
-        valid_max = []
-        for i, x in enumerate(x_values):
-            if min_vals[i] is not None and max_vals[i] is not None:
                 valid_spread_x.append(x)
-                valid_min.append(min_vals[i])
-                valid_max.append(max_vals[i])
+                valid_min.append(min(values))
+                valid_max.append(max(values))
 
         if valid_spread_x:
             ax.fill_between(
@@ -117,14 +105,9 @@ def plot_column(
 
         # Plot individual pair lines
         for series in metric_series.per_pair_series:
-            valid_x = []
-            valid_y = []
-            for x, y in zip(x_values, series):
-                if y is not None:
-                    valid_x.append(x)
-                    valid_y.append(y)
-
-            if valid_x:
+            valid_pairs = [(x, y) for x, y in zip(x_values, series) if y is not None]
+            if valid_pairs:
+                valid_x, valid_y = zip(*valid_pairs)
                 ax.plot(
                     valid_x,
                     valid_y,

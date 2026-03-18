@@ -16,7 +16,7 @@ from typing import Literal
 from .....activation_patching.coarse import CoarseActPatchAggregatedResults
 from .....activation_patching.act_patch_metrics import LabelPerspective
 from .analysis_slices import ANALYSIS_SLICES
-from .data_extraction import extract_column_data
+from .data_extraction import extract_all_columns
 from .metric_plots import plot_column
 from .style import COLUMN_METRICS
 
@@ -107,18 +107,18 @@ def plot_aggregated_structured(
                         f"{mode_label} | {analysis_slice} | n={result.n_samples}"
                     )
 
-                for column in columns:
-                    # Extract data
-                    column_data = extract_column_data(
-                        result,
-                        column,
-                        sweep_type,
-                        perspective,
-                        mode,
-                        label_persp,
-                    )
+                # Extract ALL columns at once (much more efficient)
+                all_column_data = extract_all_columns(
+                    result,
+                    sweep_type,
+                    perspective,
+                    mode,
+                    label_persp,
+                )
 
-                    if not column_data.metrics:
+                for column in columns:
+                    column_data = all_column_data.get(column)
+                    if not column_data or not column_data.metrics:
                         continue
 
                     # Plot
@@ -166,8 +166,18 @@ def plot_all_aggregated_slices(
 
     has_multi_component = len(results_by_component) > 1
 
+    # Determine which slices to generate based on sample count
+    # For small datasets, only generate the "all" slice
+    first_agg = next(iter(agg_by_component.values()))
+    n_samples = first_agg.n_samples
+    if n_samples <= 2:
+        # Only generate "all" slice for small datasets
+        slices_to_generate = [s for s in ANALYSIS_SLICES if s.name == "all"]
+    else:
+        slices_to_generate = ANALYSIS_SLICES
+
     # Generate plots for each analysis slice
-    for analysis_slice in ANALYSIS_SLICES:
+    for analysis_slice in slices_to_generate:
         slice_name = analysis_slice.name
         slice_dir = output_dir / slice_name
 
