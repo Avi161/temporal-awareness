@@ -19,7 +19,10 @@ Usage:
     uv run python scripts/intertemporal/run_intertemporal_experiment.py --rename my_experiment
 
     # Override coarse patching settings
-    uv run python scripts/intertemporal/run_intertemporal_experiment.py --coarse '{"component": "mlp_out"}'
+    uv run python scripts/intertemporal/run_intertemporal_experiment.py --coarse '{"components": ["mlp_out"]}'
+
+    # Enable attribution patching with specific methods
+    uv run python scripts/intertemporal/run_intertemporal_experiment.py --attrib '{"enabled": true, "methods": ["eap_ig"]}'
 """
 
 from __future__ import annotations
@@ -91,7 +94,14 @@ def parse_args() -> argparse.Namespace:
         type=str,
         default=None,
         metavar="JSON",
-        help='Override coarse patching settings as JSON, e.g. \'{"component": "mlp_out"}\'',
+        help='Override coarse patching settings as JSON, e.g. \'{"components": ["mlp_out"]}\'',
+    )
+    parser.add_argument(
+        "--attrib",
+        type=str,
+        default=None,
+        metavar="JSON",
+        help='Override attribution patching settings as JSON, e.g. \'{"enabled": true, "methods": ["eap_ig"]}\'',
     )
     parser.add_argument(
         "--backend",
@@ -115,14 +125,17 @@ def main() -> int:
     if args.model:
         config_dict["model"] = args.model
 
-    if args.backend:
-        config_dict["backend"] = args.backend
-
     if args.coarse:
         coarse_overrides = json.loads(args.coarse)
         if "coarse_patch" not in config_dict:
             config_dict["coarse_patch"] = {}
         config_dict["coarse_patch"].update(coarse_overrides)
+
+    if args.attrib:
+        attrib_overrides = json.loads(args.attrib)
+        if "att_patch" not in config_dict:
+            config_dict["att_patch"] = {}
+        config_dict["att_patch"].update(attrib_overrides)
 
     # Determine output directory
     output_dir = None
@@ -163,7 +176,10 @@ def main() -> int:
 
     try:
         run_experiment(
-            exp_cfg, try_loading_data=try_loading_data, output_dir=output_dir
+            exp_cfg,
+            try_loading_data=try_loading_data,
+            output_dir=output_dir,
+            backend=args.backend,
         )
         P.report()
         P.save(output_dir / "profile.json")

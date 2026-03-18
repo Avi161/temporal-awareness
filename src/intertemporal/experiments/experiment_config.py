@@ -16,6 +16,18 @@ COARSE_PATCH: dict = {
     "components": ["resid_pre", "resid_post", "attn_out", "mlp_out"],
 }
 
+# Default attribution patching settings (empty dict = skip)
+# methods: "standard", "eap", "eap_ig"
+# components: "resid_post", "attn_out", "mlp_out"
+# grad_at: "clean", "corrupted", "both"
+ATT_PATCH: dict = {
+    "enabled": False,
+    "methods": ["standard", "eap"],
+    "components": ["resid_post", "attn_out", "mlp_out"],
+    "ig_steps": 10,
+    "grad_at": "both",
+}
+
 
 @dataclass
 class ExperimentConfig(BaseSchema):
@@ -27,11 +39,11 @@ class ExperimentConfig(BaseSchema):
     max_samples: int | None = None
     n_pairs: int | None = None
 
-    # Backend override (None = auto-detect via get_recommended_backend_internals)
-    backend: str | None = None
-
     # Coarse patching settings
     coarse_patch: dict = field(default_factory=lambda: COARSE_PATCH.copy())
+
+    # Attribution patching settings
+    att_patch: dict = field(default_factory=lambda: ATT_PATCH.copy())
 
     @property
     def name(self) -> str:
