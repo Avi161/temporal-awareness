@@ -26,6 +26,9 @@ Usage:
 
     # Regenerate visualizations for all cached experiments
     uv run python scripts/intertemporal/run_intertemporal_experiment.py --viz '{"regenerate_all": true}'
+
+    # Regenerate visualizations for one specific experiment
+    uv run python scripts/intertemporal/run_intertemporal_experiment.py --viz '{"regenerate_one": "label_grid"}'
 """
 
 from __future__ import annotations
@@ -44,6 +47,9 @@ from src.intertemporal.common import get_experiment_dir
 from src.intertemporal.experiments.intertemporal_experiment import (
     ExperimentConfig,
     run_experiment,
+)
+from src.intertemporal.experiments.intertemporal_viz import (
+    generate_viz,
     regenerate_all_visualizations,
 )
 
@@ -128,12 +134,21 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
 
-    # Handle --viz with regenerate_all first (doesn't need other config)
+    # Handle --viz with regenerate options first (doesn't need other config)
     if args.viz:
         viz_config = json.loads(args.viz)
-        if viz_config.get("regenerate_all"):
+        if viz_config.get("regenerate_all", False):
             log_header("REGENERATING ALL VISUALIZATIONS", gap=1)
             regenerate_all_visualizations(get_experiment_dir())
+            return 0
+        if "regenerate_one" in viz_config:
+            exp_name = viz_config["regenerate_one"]
+            exp_dir = get_experiment_dir() / exp_name
+            if not exp_dir.exists():
+                print(f"Error: Experiment directory not found: {exp_dir}")
+                return 1
+            log_header(f"REGENERATING VISUALIZATIONS: {exp_name}", gap=1)
+            generate_viz(exp_dir)
             return 0
 
     if args.full:

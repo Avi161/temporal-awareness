@@ -26,7 +26,7 @@ ATT_PATCH: dict = {
     "enabled": True,
     "methods": ["standard", "eap", "eap_ig"],
     "components": ["resid_post", "attn_out", "mlp_out"],
-    "ig_steps": [20],
+    "ig_steps": 20,
     "grad_at": ["clean", "corrupted"],
     "quadrature": ["midpoint", "gauss-legendre", "gauss-chebyshev"],
 }

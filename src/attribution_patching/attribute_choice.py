@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Literal
 
+import numpy as np
+
 from ..common.patching_types import PatchingMode
 from .attribution_metric import AttributionMetric
 from .attribution_settings import AttributionSettings
@@ -94,6 +96,7 @@ def attribute_for_choice(
         methods=settings.methods,
         ig_steps=settings.ig_steps,
         grad_at=settings.grad_at,
+        quadrature=settings.quadrature,
     )
 
     results = _build_results(raw_results, layers)

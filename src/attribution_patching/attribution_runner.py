@@ -10,10 +10,10 @@ from ..common.contrastive_pair import ContrastivePair
 from ..common.profiler import P
 from ..common.patching_types import GradTarget, PatchingMode
 
-from .attribution_settings import GradPoint
 from .eap import compute_eap
 from .eap_ig import compute_eap_ig
 from .embedding_alignment import PaddingStrategy
+from .quadrature import QuadratureMethod
 from .standard_attribution import compute_attribution
 
 if TYPE_CHECKING:
@@ -30,6 +30,7 @@ def _run_methods_for_grad_point(
     ig_steps: int,
     padding_strategy: PaddingStrategy,
     grad_at: GradTarget,
+    quadrature: QuadratureMethod,
 ) -> dict[str, np.ndarray]:
     """Run attribution methods for a single gradient point."""
     results = {}
@@ -52,7 +53,7 @@ def _run_methods_for_grad_point(
         with P("eap_ig"):
             eap_ig = compute_eap_ig(
                 runner, pair, metric, mode, ig_steps, padding_strategy,
-                grad_at=grad_at
+                grad_at=grad_at, quadrature=quadrature
             )
             results["eap_ig_attn"] = eap_ig["attn"]
             results["eap_ig_mlp"] = eap_ig["mlp"]
@@ -72,7 +73,8 @@ def run_all_attribution_methods(
     methods: list[str] | None = None,
     ig_steps: int = 10,
     padding_strategy: PaddingStrategy = PaddingStrategy.ZERO,
-    grad_at: GradPoint = "both",
+    grad_at: list[GradTarget] | None = None,
+    quadrature: list[QuadratureMethod] | None = None,
 ) -> dict[str, np.ndarray]:
     """Run specified attribution methods and return results.
 
@@ -87,29 +89,38 @@ def run_all_attribution_methods(
             - "eap_ig": EAP with Integrated Gradients
         ig_steps: Integration steps for EAP-IG
         padding_strategy: How to pad segments for EAP-IG
-        grad_at: Where to compute gradients ("clean", "corrupted", or "both")
+        grad_at: Where to compute gradients (list of "clean" and/or "corrupted")
+        quadrature: Quadrature methods for EAP-IG (list)
 
     Returns:
         Dict with keys like 'resid', 'attn', 'mlp', 'eap_attn', 'eap_ig_attn', etc.
-        When grad_at="both", keys are suffixed with "_clean" or "_corrupted".
+        Keys are suffixed with "_clean" or "_corrupted" for grad_at variants.
     """
     if methods is None:
         methods = ["standard", "eap"]
+    if grad_at is None:
+        grad_at = ["clean", "corrupted"]
+    if quadrature is None:
+        quadrature = [QuadratureMethod.MIDPOINT]
 
-    if grad_at == "both":
-        results = {}
-        for point in ["clean", "corrupted"]:
+    results = {}
+    for point in grad_at:
+        for quad in quadrature:
             point_results = _run_methods_for_grad_point(
                 runner, pair, metric, mode, methods, ig_steps,
-                padding_strategy, point
+                padding_strategy, point, quad
             )
+            # Build suffix based on variants
+            suffix_parts = []
+            if len(grad_at) > 1:
+                suffix_parts.append(point)
+            if len(quadrature) > 1:
+                suffix_parts.append(quad.value)
+            suffix = "_" + "_".join(suffix_parts) if suffix_parts else ""
             for key, val in point_results.items():
-                results[f"{key}_{point}"] = val
-        return results
+                results[f"{key}{suffix}"] = val
 
-    return _run_methods_for_grad_point(
-        runner, pair, metric, mode, methods, ig_steps, padding_strategy, grad_at
-    )
+    return results
 
 
 def find_top_attributions(
