@@ -57,10 +57,8 @@ def _run_methods_for_grad_point(
             )
             results["eap_ig_attn"] = eap_ig["attn"]
             results["eap_ig_mlp"] = eap_ig["mlp"]
-            if "aligned_len" in eap_ig:
-                results["eap_ig_aligned_len"] = eap_ig["aligned_len"]
-                results["eap_ig_clean_pos_map"] = eap_ig["clean_pos_map"]
-                results["eap_ig_corrupted_pos_map"] = eap_ig["corrupted_pos_map"]
+            # Note: aligned_len and pos_maps are metadata, not score arrays
+            # They are not included in results to avoid type mismatches
 
     return results
 
