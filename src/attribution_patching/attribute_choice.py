@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from typing import Literal
 
+import numpy as np
+
+from ..common.patching_types import PatchingMode
+from ..common.profiler import profile
 from .attribution_metric import AttributionMetric
 from .attribution_settings import AttributionSettings
 from .attribution_results import (
@@ -60,11 +64,12 @@ def _build_results(
     return results
 
 
+@profile
 def attribute_for_choice(
     runner: BinaryChoiceRunner,
     pair: ContrastivePair,
     settings: AttributionSettings | None = None,
-    mode: Literal["denoising", "noising"] = "denoising",
+    mode: PatchingMode = "denoising",
 ) -> AttributionSummary:
     """Compute attribution scores for a contrastive pair.
 
@@ -93,12 +98,14 @@ def attribute_for_choice(
         methods=settings.methods,
         ig_steps=settings.ig_steps,
         grad_at=settings.grad_at,
+        quadrature=settings.quadrature,
     )
 
     results = _build_results(raw_results, layers)
     return AttributionSummary(results=results, n_pairs=1, mode=mode)
 
 
+@profile
 def attribute_pair(
     runner: BinaryChoiceRunner,
     pair: ContrastivePair,

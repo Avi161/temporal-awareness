@@ -104,14 +104,24 @@ class TokenTree(BaseSchema):
         return len(self.groups)
 
     def pop_heavy(self) -> None:
-        """Pop full_logits from all trajectories.
+        """Remove heavy data from tree to reduce memory/serialization size.
 
-        Returns:
-            Dict mapping trajectory index to its full_logits tensor.
-            Only includes trajectories that had full_logits.
+        Clears:
+        - full_logits from all trajectories
+        - vocab_logits from all nodes and forks (full vocabulary distributions)
         """
         for traj in self.trajs:
             traj.pop_heavy()
+
+        # Clear vocab_logits from nodes (full vocab distributions at branch points)
+        if self.nodes:
+            for node in self.nodes:
+                node.vocab_logits = None
+
+        # Clear vocab_logits from forks
+        if self.forks:
+            for fork in self.forks:
+                fork.vocab_logits = None
 
     @classmethod
     def from_dict(cls, d: dict) -> "TokenTree":
@@ -165,7 +175,7 @@ class _Branch:
     """One arm of a divergence: a group of trajectories that share the same
     logits (and therefore the same next-token distribution) at a position."""
 
-    logits: torch.Tensor
+    logits: torch.Tensor | None
     traj_indices: list[int]
     token_id: int
     token_logprob: float

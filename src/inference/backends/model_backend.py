@@ -3,12 +3,27 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Optional, Sequence
 
 import torch
 
 from ..interventions import Intervention
+
+
+@dataclass
+class BinaryChoiceResult:
+    """Result of a binary choice query from API backend.
+
+    Used by API backends (OpenAI, Anthropic) to return choice probabilities
+    without requiring full trajectory computation.
+    """
+
+    choice_idx: int  # 0 for A, 1 for B, -1 if neither
+    probs: tuple[float, float]  # (prob_a, prob_b)
+    logprobs: tuple[float, float]  # (logprob_a, logprob_b)
+    tokens: tuple[str, str]  # The actual tokens used
 
 
 class ModelBackend(Enum):
@@ -19,6 +34,8 @@ class ModelBackend(Enum):
     TRANSFORMERLENS = "transformerlens"
     HUGGINGFACE = "huggingface"
     NNSIGHT = "nnsight"
+    OPENAI = "openai"
+    ANTHROPIC = "anthropic"
 
 
 class Backend(ABC):
@@ -31,6 +48,11 @@ class Backend(ABC):
     supports_inference_mode: bool = (
         True  # Override to False if backend conflicts with inference_mode
     )
+
+    @property
+    def is_cloud_api(self) -> bool:
+        """Whether this is a cloud API backend (no local model weights)."""
+        return False
 
     def __init__(self, runner: Any):
         """Initialize backend with a reference to the ModelRunner.
@@ -162,6 +184,27 @@ class Backend(ABC):
         """Run forward with interventions AND capture activations with gradients."""
         ...
 
+    @abstractmethod
+    def generate_trajectory(
+        self,
+        token_ids: list[int],
+        max_new_tokens: int,
+        temperature: float,
+    ) -> tuple[list[int], list[float]]:
+        """Generate trajectory with KV caching.
+
+        Args:
+            token_ids: Input token IDs
+            max_new_tokens: Maximum tokens to generate
+            temperature: Sampling temperature (0.0 = greedy)
+
+        Returns:
+            Tuple of (all_token_ids, logprobs) where logprobs[i] is the
+            log probability of token_ids[i] given the previous tokens.
+            The first token has logprob=0.0 (no prior context).
+        """
+        ...
+
     def get_embeddings(self, token_ids: torch.Tensor) -> torch.Tensor:
         """Get token embeddings from the model.
 
@@ -212,3 +255,4 @@ class Backend(ABC):
         raise NotImplementedError(
             f"{self.__class__.__name__} does not support get_b_U"
         )
+

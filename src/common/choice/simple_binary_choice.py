@@ -11,8 +11,6 @@ from dataclasses import dataclass
 from typing import Any, Sequence
 
 
-from ..analysis.analyze import analyze_token_tree
-from ..analysis.tree_as_structures_system import StructureSystemAnalysis
 from ..token_tree import TokenTrajectory, TokenTree
 from .binary_choice import BinaryChoice, LabeledBinaryChoice
 
@@ -39,8 +37,6 @@ class SimpleBinaryChoice(BinaryChoice):
         traj_a: TokenTrajectory,
         traj_b: TokenTrajectory,
         trunk: Sequence[int] | None = None,
-        W_U: Any = None,
-        b_U: Any = None,
         **kwargs: Any,
     ) -> SimpleBinaryChoice:
         """Build a SimpleBinaryChoice (or subclass) from two trajectories.
@@ -48,12 +44,12 @@ class SimpleBinaryChoice(BinaryChoice):
         Each trajectory represents a different label/choice, so they are
         placed in separate groups for cross-group fork creation.
 
+        Note: Call analyze_token_tree() separately if analysis is needed.
+
         Args:
             traj_a: First trajectory (label A)
             traj_b: Second trajectory (label B)
             trunk: Optional shared prefix token IDs
-            W_U: Optional unembedding matrix for TCB computation
-            b_U: Optional unembedding bias for TCB computation
             **kwargs: Additional arguments for the class constructor
         """
         tree = TokenTree.from_trajectories(
@@ -62,7 +58,6 @@ class SimpleBinaryChoice(BinaryChoice):
             fork_arms=[(0, 1)],
             trunk=trunk,
         )
-        analyze_token_tree(tree, W_U=W_U, b_U=b_U)  # Sets tree.analysis
         return cls(tree=tree, **kwargs)
 
     # ── Decision ─────────────────────────────────────────────────────────
@@ -70,7 +65,7 @@ class SimpleBinaryChoice(BinaryChoice):
     @property
     def choice_idx(self) -> int:
         """0 if model prefers A, 1 if B, -1 if tied."""
-        lp_a, lp_b = self._divergent_logprobs
+        lp_a, lp_b = self.divergent_logprobs
         if lp_a > lp_b:
             return 0
         if lp_b > lp_a:
@@ -91,7 +86,7 @@ class SimpleBinaryChoice(BinaryChoice):
         idx = self.choice_idx
         if idx == -1:
             return None
-        return self._divergent_logprobs[idx]
+        return self.divergent_logprobs[idx]
 
     @property
     def alternative_logprob(self) -> float | None:
@@ -99,7 +94,7 @@ class SimpleBinaryChoice(BinaryChoice):
         idx = self.choice_idx
         if idx == -1:
             return None
-        return self._divergent_logprobs[1 - idx]
+        return self.divergent_logprobs[1 - idx]
 
     # ── Trajectory access ────────────────────────────────────────────────
 
@@ -124,15 +119,20 @@ class SimpleBinaryChoice(BinaryChoice):
             return None
         return self.tree.nodes[0].branching_token_position
 
-    # ── Internal ─────────────────────────────────────────────────────────
-
     @property
-    def _divergent_logprobs(self) -> tuple[float, float]:
+    def divergent_logprobs(self) -> tuple[float, float]:
         """(logprob_a, logprob_b) at the first divergent position."""
         if not self.tree.forks:
             return (0.0, 0.0)
         lp = self.tree.forks[0].next_token_logprobs
         return (float(lp[0]), float(lp[1]))
+
+    @property
+    def divergent_logits(self) -> tuple[float, float] | None:
+        """(logit_a, logit_b) at the first divergent position, or None if unavailable."""
+        if not self.tree.forks:
+            return None
+        return self.tree.forks[0].next_token_logits
 
     def pop_heavy(self):
         self.tree.pop_heavy()

@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from ...activation_patching import ActPatchAggregatedResult
+from ...common import profile
 from ...viz.plot_helpers import finalize_plot as _finalize_plot
 from ...viz.patching_heatmaps import (
     PatchingHeatmapConfig,
@@ -17,6 +18,7 @@ from ...viz.patching_heatmaps import (
 from ...viz.viz_act_patch import visualize_activation_patching
 
 
+@profile
 def visualize_fine_patching(
     result: ActPatchAggregatedResult | None,
     output_dir: Path,
