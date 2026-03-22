@@ -15,6 +15,7 @@ This module delegates to submodules in the `coarse/` package:
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from ...activation_patching.coarse import (
     CoarseActPatchAggregatedResults,
@@ -24,11 +25,21 @@ from ...common import profile
 from ...common.contrastive_pair import ContrastivePair
 from ...viz.token_coloring import PairTokenColoring
 from .coarse.aggregated import plot_aggregated_structured, plot_all_aggregated_slices
-from .coarse.comparison import plot_comparison
+from .coarse.coarse_comparison import plot_comparison
 from .coarse.component_comparison import plot_all_component_comparisons
-from .coarse.redundancy import plot_redundancy
-from .coarse.sanity import plot_sanity_check
-from .coarse.sweep_plots import plot_layer_sweep, plot_position_sweep
+from .coarse.coarse_redundancy import plot_redundancy
+from .coarse.coarse_sanity import plot_sanity_check
+from .coarse.fork_comparison import plot_fork_comparison
+
+if TYPE_CHECKING:
+    from ...intertemporal.experiments.processing import ProcessedResults
+from .coarse.sweep_plots import (
+    ExtractionMode,
+    get_multilabel_extraction_modes,
+    get_n_labels_from_sweep,
+    plot_layer_sweep,
+    plot_position_sweep,
+)
 
 
 @profile
@@ -69,19 +80,81 @@ def visualize_coarse_patching(
 
     component = result.component
 
+    # Detect multilabel from first available sweep data
+    n_labels = 1
+    for step_size in result.layer_step_sizes:
+        layer_data = result.get_layer_results_for_step(step_size)
+        if layer_data:
+            n_labels = get_n_labels_from_sweep(layer_data)
+            break
+    if n_labels == 1:
+        for step_size in result.position_step_sizes:
+            pos_data = result.get_position_results_for_step(step_size)
+            if pos_data:
+                n_labels = get_n_labels_from_sweep(pos_data)
+                break
+
+    is_multilabel = n_labels > 1
+    by_method_modes, by_fork_modes = [], []
+    if is_multilabel:
+        by_method_modes, by_fork_modes = get_multilabel_extraction_modes(
+            n_labels, label_pairs=result.label_pairs
+        )
+
     # Layer sweep visualizations (both perspectives)
     for step_size in result.layer_step_sizes:
         layer_data = result.get_layer_results_for_step(step_size)
         if layer_data:
+            # Main plots (default aggregation)
             plot_layer_sweep(layer_data, output_dir, step_size, "short", component)
             plot_layer_sweep(layer_data, output_dir, step_size, "long", component)
+
+            # Multilabel: by_fork only for per-pair (by_method is in agg_coarse only)
+            if is_multilabel:
+                for extraction in by_fork_modes:
+                    fork_dir = output_dir / "by_fork" / f"fork_{extraction.fork_idx}"
+                    plot_layer_sweep(layer_data, fork_dir, step_size, "short", component, extraction)
+                    plot_layer_sweep(layer_data, fork_dir, step_size, "long", component, extraction)
 
     # Position sweep visualizations (both perspectives)
     for step_size in result.position_step_sizes:
         pos_data = result.get_position_results_for_step(step_size)
         if pos_data:
+            # Main plots (default aggregation)
             plot_position_sweep(pos_data, output_dir, step_size, "short", coloring, component)
             plot_position_sweep(pos_data, output_dir, step_size, "long", coloring, component)
+
+            # Multilabel: by_fork only for per-pair (by_method is in agg_coarse only)
+            if is_multilabel:
+                for extraction in by_fork_modes:
+                    fork_dir = output_dir / "by_fork" / f"fork_{extraction.fork_idx}"
+                    plot_position_sweep(pos_data, fork_dir, step_size, "short", coloring, component, extraction)
+                    plot_position_sweep(pos_data, fork_dir, step_size, "long", coloring, component, extraction)
+
+    # Fork comparison for multilabel
+    if is_multilabel:
+        for step_size in result.layer_step_sizes:
+            layer_data = result.get_layer_results_for_step(step_size)
+            if layer_data:
+                plot_fork_comparison(
+                    layer_data, output_dir, step_size, "short",
+                    label_pairs=result.label_pairs, sweep_type="layer", component=component
+                )
+                plot_fork_comparison(
+                    layer_data, output_dir, step_size, "long",
+                    label_pairs=result.label_pairs, sweep_type="layer", component=component
+                )
+        for step_size in result.position_step_sizes:
+            pos_data = result.get_position_results_for_step(step_size)
+            if pos_data:
+                plot_fork_comparison(
+                    pos_data, output_dir, step_size, "short",
+                    label_pairs=result.label_pairs, sweep_type="position", component=component
+                )
+                plot_fork_comparison(
+                    pos_data, output_dir, step_size, "long",
+                    label_pairs=result.label_pairs, sweep_type="position", component=component
+                )
 
     # Denoising vs Noising comparison and redundancy plots (for all step sizes)
     all_step_sizes = set(result.layer_step_sizes) | set(result.position_step_sizes)
@@ -134,6 +207,9 @@ def visualize_component_comparison(
 def visualize_all_aggregated(
     agg_by_component: dict[str, CoarseActPatchAggregatedResults],
     output_dir: Path,
+    pref_pairs: list | None = None,
+    exp_dir: Path | None = None,
+    processed_results: "ProcessedResults | None" = None,
 ) -> None:
     """Visualize all aggregated results with new folder structure.
 
@@ -151,6 +227,9 @@ def visualize_all_aggregated(
     Args:
         agg_by_component: Dict mapping component name to aggregated results
         output_dir: Base output directory (typically agg/)
+        pref_pairs: Optional ContrastivePreferences list for slice filtering
+        exp_dir: Optional experiment dir for loading cached horizon analysis
+        processed_results: Pre-computed analysis results from step_process_results
     """
     if not agg_by_component:
         print("[viz] No aggregated results to visualize")
@@ -159,4 +238,4 @@ def visualize_all_aggregated(
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    plot_all_aggregated_slices(agg_by_component, output_dir)
+    plot_all_aggregated_slices(agg_by_component, output_dir, pref_pairs, exp_dir, processed_results)
