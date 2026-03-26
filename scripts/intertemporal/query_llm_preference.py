@@ -24,14 +24,14 @@ from src.intertemporal.data.default_configs import FULL_EXPERIMENT_CONFIG
 from src.intertemporal.preference import (
     PreferenceQuerier,
     PreferenceQueryConfig,
-    PreferenceDataset,
+    analyze_preferences,
+    print_analysis,
 )
 from src.intertemporal.prompt import (
     PromptDatasetConfig,
     PromptDatasetGenerator,
     PromptDataset,
 )
-from src.intertemporal.common.contrastive_utils import get_contrastive_preferences
 
 
 # Default query config for querying models
@@ -74,7 +74,9 @@ def get_args():
 
 def generate_test_dataset() -> str:
     """Generate a test dataset and return its ID."""
-    prompt_dataset_cfg = PromptDatasetConfig.from_dict(FULL_EXPERIMENT_CONFIG["dataset_config"])
+    prompt_dataset_cfg = PromptDatasetConfig.from_dict(
+        FULL_EXPERIMENT_CONFIG["dataset_config"]
+    )
     generator = PromptDatasetGenerator(prompt_dataset_cfg)
     dataset = generator.generate()
     dataset.save_as_json()
@@ -116,16 +118,6 @@ def load_config(args) -> PreferenceQueryConfig:
     )
 
 
-def print_summary(pref_dataset: PreferenceDataset) -> None:
-    pref_dataset.print_all()
-
-    # Print summary
-    short_count = sum(1 for p in pref_dataset.preferences if p.chose_short_term)
-    long_count = sum(1 for p in pref_dataset.preferences if p.chose_long_term)
-    print(f"\n  Total: {len(pref_dataset.preferences)}")
-    print(f"  Short-term: {short_count}, Long-term: {long_count}")
-
-
 def main() -> int:
     args = get_args()
     config, prompt_datasets, model_names = load_config(args)
@@ -144,13 +136,9 @@ def main() -> int:
 
             output_path = output_dir / pref_dataset.get_filename()
             pref_dataset.save_as_json(output_path)
-            print_summary(pref_dataset)
 
-            # Find contrastive preference pairs
-            contrastive_pairs = get_contrastive_preferences(pref_dataset)
-            print(f"\n  Contrastive pairs found: {len(contrastive_pairs)}")
-            for pair in contrastive_pairs:
-                print(f"    {pair}")
+            analysis = analyze_preferences(pref_dataset)
+            print_analysis(analysis)
 
     return 0
 

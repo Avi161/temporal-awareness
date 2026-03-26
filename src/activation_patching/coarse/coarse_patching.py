@@ -14,7 +14,7 @@ from .sweep_runners import run_sanity_check, run_layer_sweep, run_position_sweep
 def run_coarse_act_patching(
     runner: BinaryChoiceRunner,
     pair: ContrastivePair,
-    min_layer_depth: float = 0.0,
+    min_layer_depth: float = 0.45,
     max_layer_depth: float = 1.0,
     component: str | None = None,
     layer_step_sizes: list[int] | None = None,
@@ -94,8 +94,16 @@ def run_coarse_act_patching(
     clear_gpu_memory()
     print("[coarse] Done.")
 
+    # Extract label_pairs from sanity result for multilabel experiments
+    label_pairs = None
+    if sanity_result and sanity_result.denoising:
+        baseline = sanity_result.denoising.baseline_clean
+        if baseline and hasattr(baseline, "label_pairs"):
+            label_pairs = baseline.label_pairs
+
     return CoarseActPatchResults(
         sanity_result=sanity_result,
         layer_results=layer_results,
         position_results=position_results,
+        label_pairs=label_pairs,
     )
