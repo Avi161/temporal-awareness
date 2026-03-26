@@ -61,10 +61,14 @@ def extract_activations_for_prompts(
     prompts: list[str],
     desc: str = "Extracting",
 ) -> torch.Tensor:
-    """Extract last-token residual stream activations at every layer.
+    """Extract residual stream activations at the last choice token for every layer.
 
-    For each prompt, runs a cached forward pass and stacks the last-token
-    activation from every hook_resid_post hook across all layers.
+    For chat-template models the formatted sequence ends with:
+        ... <choice text> <|im_end|> \\n <|im_start|> assistant \\n
+    The token at position -1 is therefore an assistant-turn suffix token, not the
+    choice text itself.  We find the last <|im_end|> in the sequence (which closes
+    the user turn) and step back one position to land on the final token of the
+    choice text.  For tokenizers that do not have <|im_end|> we fall back to -1.
 
     Args:
         runner: ModelRunner with TransformerLens backend.
@@ -77,13 +81,30 @@ def extract_activations_for_prompts(
     n_layers = runner.n_layers
     all_acts = []
 
+    # Resolve the <|im_end|> token ID once outside the loop.
+    _im_end_id = runner._model.tokenizer.convert_tokens_to_ids("<|im_end|>")
+    _has_im_end = isinstance(_im_end_id, int) and _im_end_id != runner._model.tokenizer.unk_token_id
+
     for prompt in tqdm(prompts, desc=desc):
-        _, cache = runner.run_with_cache(
-            prompt,
+        formatted = runner.apply_chat_template(prompt)
+        input_ids = runner.encode(formatted)          # [1, seq_len]
+        _, cache  = runner._backend.run_with_cache(
+            input_ids,
             names_filter=lambda n: "hook_resid_post" in n,
         )
+
+        if _has_im_end:
+            ids_list   = input_ids[0].tolist()
+            last_pos   = max(i for i, t in enumerate(ids_list) if t == _im_end_id)
+            target_idx = last_pos - 1
+            assert target_idx >= 0, (
+                "target_idx < 0 — the chat template may have changed shape"
+            )
+        else:
+            target_idx = -1
+
         layer_acts = torch.stack(
-            [cache[f"blocks.{layer}.hook_resid_post"][0, -1, :] for layer in range(n_layers)],
+            [cache[f"blocks.{layer}.hook_resid_post"][0, target_idx, :] for layer in range(n_layers)],
             dim=0,
         )  # [n_layers, d_model]
         all_acts.append(layer_acts.cpu())
