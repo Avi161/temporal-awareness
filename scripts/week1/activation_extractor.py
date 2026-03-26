@@ -35,7 +35,7 @@ def build_prompts(
 ) -> tuple[list[str], list[str], list[str]]:
     """Build immediate and long-term prompts from contrastive pairs.
 
-    Template: question + "\\n\\nChoices:\\n" + choice_text
+    Template: question + choice_text  (raw concatenation, no separator)
 
     Args:
         pairs: List of pair dicts with {question, immediate, long_term, category}.
@@ -49,8 +49,8 @@ def build_prompts(
 
     for pair in pairs:
         question = pair["question"]
-        immediate_prompts.append(f"{question}\n\nChoices:\n{pair['immediate']}")
-        long_term_prompts.append(f"{question}\n\nChoices:\n{pair['long_term']}")
+        immediate_prompts.append(pair["question"] + pair["immediate"])
+        long_term_prompts.append(pair["question"] + pair["long_term"])
         categories.append(pair["category"])
 
     return immediate_prompts, long_term_prompts, categories
