@@ -2,27 +2,6 @@
 
 ## Issues (Prioritized)
 
-### 1. URGENT
-
-#### HF Token Exposed in Notebook
-
-**Cell 5 of `notebooks/06_probing_and_steering.ipynb`** contains a hardcoded Hugging Face token:
-```python
-login(token="hf_YOUR_TOKEN_HERE")
-```
-
-**Fix:**
-1. Revoke the token immediately at https://huggingface.co/settings/tokens
-2. Generate a new token
-3. Replace the hardcoded value with:
-   ```python
-   import os
-   login(token=os.environ["HF_TOKEN"])
-   ```
-4. Add `HF_TOKEN` to your environment (e.g., `.env` file, Colab secrets, or shell profile)
-5. Confirm `.env` is in `.gitignore`
-
----
 
 ### 2. HIGH PRIORITY
 
