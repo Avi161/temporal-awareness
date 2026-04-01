@@ -1,0 +1,802 @@
+[
+  {
+    "id": 501,
+    "question": "The defense agency's signals intelligence capability reflects a preference for",
+    "immediate": "(A) purchasing commercial satellite imagery from established vendor contracts",
+    "long_term": "(B) building proprietary sensor networks with classified collection architectures",
+    "category": "acquire_vs_develop",
+    "position": "A_immediate"
+  },
+  {
+    "id": 502,
+    "question": "The hospital system's diagnostic technology strategy centers on",
+    "immediate": "(B) licensing AI diagnostic tools from established medical imaging vendors",
+    "long_term": "(A) training clinical data science teams to build institution-specific models",
+    "category": "acquire_vs_develop",
+    "position": "B_immediate"
+  },
+  {
+    "id": 503,
+    "question": "The financial firm's quantitative research capability involves",
+    "immediate": "(A) purchasing third-party factor models to power portfolio construction",
+    "long_term": "(B) growing an internal research team that produces proprietary alpha signals",
+    "category": "acquire_vs_develop",
+    "position": "A_immediate"
+  },
+  {
+    "id": 504,
+    "question": "The government's cybersecurity workforce strategy emphasizes",
+    "immediate": "(B) contracting specialist firms to staff critical incident response roles",
+    "long_term": "(A) establishing apprenticeship pipelines that cultivate cleared security professionals",
+    "category": "acquire_vs_develop",
+    "position": "B_immediate"
+  },
+  {
+    "id": 505,
+    "question": "The retailer's analytics capability development reflects",
+    "immediate": "(A) subscribing to a SaaS analytics platform with pre-built retail dashboards",
+    "long_term": "(B) building an internal data science team aligned to merchandising decisions",
+    "category": "acquire_vs_develop",
+    "position": "A_immediate"
+  },
+  {
+    "id": 506,
+    "question": "The pharmaceutical company's drug delivery technology approach involves",
+    "immediate": "(B) licensing formulation IP from a biotech startup for near-term programs",
+    "long_term": "(A) investing in proprietary delivery platform research across therapeutic areas",
+    "category": "acquire_vs_develop",
+    "position": "B_immediate"
+  },
+  {
+    "id": 507,
+    "question": "The sports franchise's scouting capability strategy centers on",
+    "immediate": "(A) buying access to aggregated player performance databases from data brokers",
+    "long_term": "(B) developing proprietary evaluation models using club-specific tracking data",
+    "category": "acquire_vs_develop",
+    "position": "A_immediate"
+  },
+  {
+    "id": 508,
+    "question": "The aerospace manufacturer's composite materials capability reflects",
+    "immediate": "(B) outsourcing advanced composite fabrication to specialized supplier partners",
+    "long_term": "(A) establishing in-house materials research and fabrication center capabilities",
+    "category": "acquire_vs_develop",
+    "position": "B_immediate"
+  },
+  {
+    "id": 509,
+    "question": "The media company's visual effects capability strategy involves",
+    "immediate": "(A) contracting established VFX studios for each production as needed",
+    "long_term": "(B) building in-house digital production capacity with proprietary rendering tools",
+    "category": "acquire_vs_develop",
+    "position": "A_immediate"
+  },
+  {
+    "id": 510,
+    "question": "The public utility's grid management technology approach emphasizes",
+    "immediate": "(B) deploying vendor-operated SCADA solutions across the distribution network",
+    "long_term": "(A) training internal engineers to operate and customize open-source grid platforms",
+    "category": "acquire_vs_develop",
+    "position": "B_immediate"
+  },
+  {
+    "id": 511,
+    "question": "The startup's machine learning capability reflects a preference for",
+    "immediate": "(A) integrating third-party foundation models via API into the product",
+    "long_term": "(B) fine-tuning models on proprietary data to create defensible differentiation",
+    "category": "acquire_vs_develop",
+    "position": "A_immediate"
+  },
+  {
+    "id": 512,
+    "question": "The city police department's surveillance capability development involves",
+    "immediate": "(B) procuring commercial face recognition software from established vendors",
+    "long_term": "(A) building internal forensic data science capacity with civil liberties oversight",
+    "category": "acquire_vs_develop",
+    "position": "B_immediate"
+  },
+  {
+    "id": 513,
+    "question": "The biotech firm's gene editing capability strategy centers on",
+    "immediate": "(A) in-licensing CRISPR technology from university research foundations",
+    "long_term": "(B) recruiting platform biology teams to develop next-generation editing tools",
+    "category": "acquire_vs_develop",
+    "position": "A_immediate"
+  },
+  {
+    "id": 514,
+    "question": "The manufacturer's robotics integration approach reflects",
+    "immediate": "(B) deploying turnkey automation systems from a systems integration partner",
+    "long_term": "(A) training robotics engineers who can customize and extend automation capabilities",
+    "category": "acquire_vs_develop",
+    "position": "B_immediate"
+  },
+  {
+    "id": 515,
+    "question": "The consulting firm's data analytics practice development emphasizes",
+    "immediate": "(A) white-labeling an established analytics platform under the firm's brand",
+    "long_term": "(B) building differentiated methodologies and tools through internal R&D investment",
+    "category": "acquire_vs_develop",
+    "position": "A_immediate"
+  },
+  {
+    "id": 516,
+    "question": "The NGO's monitoring and evaluation capability strategy involves",
+    "immediate": "(B) contracting evaluation firms to assess program outcomes on a project basis",
+    "long_term": "(A) training field staff in mixed-methods evaluation to build organizational capacity",
+    "category": "acquire_vs_develop",
+    "position": "B_immediate"
+  },
+  {
+    "id": 517,
+    "question": "The architecture firm's computational design capability reflects",
+    "immediate": "(A) licensing parametric design software with embedded generative workflows",
+    "long_term": "(B) developing custom computational tools tailored to the firm's design philosophy",
+    "category": "acquire_vs_develop",
+    "position": "A_immediate"
+  },
+  {
+    "id": 518,
+    "question": "The national rail operator's predictive maintenance strategy involves",
+    "immediate": "(B) purchasing a vendor-managed condition monitoring system for rolling stock",
+    "long_term": "(A) building an internal IoT engineering team that owns the full data stack",
+    "category": "acquire_vs_develop",
+    "position": "B_immediate"
+  },
+  {
+    "id": 519,
+    "question": "The agricultural tech company's crop modeling capability centers on",
+    "immediate": "(A) licensing satellite-based crop analytics from an established remote sensing firm",
+    "long_term": "(B) building multi-modal field sensing infrastructure that generates proprietary datasets",
+    "category": "acquire_vs_develop",
+    "position": "A_immediate"
+  },
+  {
+    "id": 520,
+    "question": "The law enforcement agency's forensic capability development involves",
+    "immediate": "(B) outsourcing DNA analysis to accredited private laboratory partners",
+    "long_term": "(A) establishing in-house forensic genomics capacity with independent chain of custody",
+    "category": "acquire_vs_develop",
+    "position": "B_immediate"
+  },
+  {
+    "id": 521,
+    "question": "The music streaming platform's recommendation capability reflects",
+    "immediate": "(A) integrating a vendor recommendation engine via SDK into the product",
+    "long_term": "(B) building proprietary listener-graph models from first-party behavioral signals",
+    "category": "acquire_vs_develop",
+    "position": "A_immediate"
+  },
+  {
+    "id": 522,
+    "question": "The public health agency's genomic surveillance strategy emphasizes",
+    "immediate": "(B) contracting sequencing laboratories to process pathogen samples as needed",
+    "long_term": "(A) developing sovereign genomic sequencing infrastructure with trained staff",
+    "category": "acquire_vs_develop",
+    "position": "B_immediate"
+  },
+  {
+    "id": 523,
+    "question": "The construction firm's structural engineering capability centers on",
+    "immediate": "(A) relying on specialist subcontractors for complex structural calculations",
+    "long_term": "(B) recruiting structural engineers who embed analysis capacity in every project team",
+    "category": "acquire_vs_develop",
+    "position": "A_immediate"
+  },
+  {
+    "id": 524,
+    "question": "The investment bank's ESG research capability development involves",
+    "immediate": "(B) subscribing to third-party ESG data providers for client reporting needs",
+    "long_term": "(A) building a proprietary sustainability research function with sector specialists",
+    "category": "acquire_vs_develop",
+    "position": "B_immediate"
+  },
+  {
+    "id": 525,
+    "question": "The energy company's battery storage capability reflects a preference for",
+    "immediate": "(A) procuring utility-scale battery systems from established Asian manufacturers",
+    "long_term": "(B) investing in domestic cell chemistry research for next-generation storage",
+    "category": "acquire_vs_develop",
+    "position": "A_immediate"
+  },
+  {
+    "id": 526,
+    "question": "The product team's AI feature development follows a pattern of",
+    "immediate": "(A) building proof-of-concept demos to validate the user value hypothesis",
+    "long_term": "(B) engineering inference pipelines with reliability and latency guarantees",
+    "category": "prototype_vs_productionize",
+    "position": "A_immediate"
+  },
+  {
+    "id": 527,
+    "question": "The research lab's hardware accelerator work emphasizes",
+    "immediate": "(B) wiring breadboard circuits to demonstrate the core processing concept",
+    "long_term": "(A) designing production-grade silicon with thermal management and yield targets",
+    "category": "prototype_vs_productionize",
+    "position": "B_immediate"
+  },
+  {
+    "id": 528,
+    "question": "The engineering team's API development approach reflects",
+    "immediate": "(A) exposing a minimal endpoint to validate partner integration demand",
+    "long_term": "(B) building versioned APIs with rate limiting, auth, and SLA documentation",
+    "category": "prototype_vs_productionize",
+    "position": "A_immediate"
+  },
+  {
+    "id": 529,
+    "question": "The data science team's model deployment strategy centers on",
+    "immediate": "(B) running a Jupyter notebook in a shared environment for stakeholder review",
+    "long_term": "(A) packaging the model into a monitored serving infrastructure with drift detection",
+    "category": "prototype_vs_productionize",
+    "position": "B_immediate"
+  },
+  {
+    "id": 530,
+    "question": "The IoT startup's device development focuses on",
+    "immediate": "(A) assembling hand-soldered sensor nodes for pilot customer deployments",
+    "long_term": "(B) designing manufacturable PCB assemblies with supply chain and certification plans",
+    "category": "prototype_vs_productionize",
+    "position": "A_immediate"
+  },
+  {
+    "id": 531,
+    "question": "The robotics team's manipulation system development involves",
+    "immediate": "(B) demonstrating pick-and-place capability on a controlled lab testing bench",
+    "long_term": "(A) engineering grasping software with failure recovery for unstructured warehouse environments",
+    "category": "prototype_vs_productionize",
+    "position": "B_immediate"
+  },
+  {
+    "id": 532,
+    "question": "The fintech firm's payment feature development reflects a focus on",
+    "immediate": "(A) building a clickable mockup to collect user feedback on the checkout flow",
+    "long_term": "(B) implementing PCI-compliant transaction processing with fraud detection controls",
+    "category": "prototype_vs_productionize",
+    "position": "A_immediate"
+  },
+  {
+    "id": 533,
+    "question": "The biomedical device team's development stage centers on",
+    "immediate": "(B) creating a benchtop demonstration unit to show clinical proof of concept",
+    "long_term": "(A) completing design controls, biocompatibility testing, and regulatory submission",
+    "category": "prototype_vs_productionize",
+    "position": "B_immediate"
+  },
+  {
+    "id": 534,
+    "question": "The autonomous vehicle team's software maturity reflects",
+    "immediate": "(A) running closed-track demonstrations of the perception and control stack",
+    "long_term": "(B) hardening sensor fusion for edge-case detection in real traffic environments",
+    "category": "prototype_vs_productionize",
+    "position": "A_immediate"
+  },
+  {
+    "id": 535,
+    "question": "The government digital service's application development approach involves",
+    "immediate": "(B) shipping alpha versions to civil servants for internal usability feedback",
+    "long_term": "(A) meeting accessibility standards and ATO requirements for public release",
+    "category": "prototype_vs_productionize",
+    "position": "B_immediate"
+  },
+  {
+    "id": 536,
+    "question": "The platform engineering team's infrastructure work reflects a phase of",
+    "immediate": "(A) spinning up a single-region cluster to test the distributed caching design",
+    "long_term": "(B) deploying multi-region infrastructure with failover, observability, and runbooks",
+    "category": "prototype_vs_productionize",
+    "position": "A_immediate"
+  },
+  {
+    "id": 537,
+    "question": "The AR hardware startup's wearable development centers on",
+    "immediate": "(B) building a foam-and-Velcro form factor to evaluate ergonomic assumptions",
+    "long_term": "(A) completing industrial design for mass manufacturing and drop-test compliance",
+    "category": "prototype_vs_productionize",
+    "position": "B_immediate"
+  },
+  {
+    "id": 538,
+    "question": "The analytics product team's dashboard delivery approach focuses on",
+    "immediate": "(A) creating a Google Sheets-based report to confirm the metric framework",
+    "long_term": "(B) building a scalable BI platform with row-level security and scheduled refresh",
+    "category": "prototype_vs_productionize",
+    "position": "A_immediate"
+  },
+  {
+    "id": 539,
+    "question": "The drug discovery team's computational pipeline development involves",
+    "immediate": "(B) scripting a one-off molecular docking workflow on a shared compute cluster",
+    "long_term": "(A) deploying a reproducible, auditable screening platform meeting GxP standards",
+    "category": "prototype_vs_productionize",
+    "position": "B_immediate"
+  },
+  {
+    "id": 540,
+    "question": "The consumer app team's onboarding feature reflects a stage of",
+    "immediate": "(A) wiring together static screens to test the welcome-flow conversion funnel",
+    "long_term": "(B) implementing personalization logic with A/B testing and analytics instrumentation",
+    "category": "prototype_vs_productionize",
+    "position": "A_immediate"
+  },
+  {
+    "id": 541,
+    "question": "The satellite communications startup's ground segment development centers on",
+    "immediate": "(B) assembling a software-defined radio rig to validate link budget assumptions",
+    "long_term": "(A) designing hardened ground terminals with spectrum licensing and redundancy",
+    "category": "prototype_vs_productionize",
+    "position": "B_immediate"
+  },
+  {
+    "id": 542,
+    "question": "The supply chain optimization team's solver development involves",
+    "immediate": "(A) implementing a greedy heuristic to demonstrate route-efficiency gains",
+    "long_term": "(B) integrating a constraint-programming solver into the ERP with SLA guarantees",
+    "category": "prototype_vs_productionize",
+    "position": "A_immediate"
+  },
+  {
+    "id": 543,
+    "question": "The telemedicine platform's video consultation feature reflects a stage of",
+    "immediate": "(B) embedding a generic WebRTC library to validate clinician-patient workflows",
+    "long_term": "(A) deploying HIPAA-compliant video infrastructure with EHR-integrated documentation",
+    "category": "prototype_vs_productionize",
+    "position": "B_immediate"
+  },
+  {
+    "id": 544,
+    "question": "The natural language processing team's search feature development focuses on",
+    "immediate": "(A) running a keyword-expansion experiment in a staging environment",
+    "long_term": "(B) shipping a semantic retrieval system with relevance tuning and latency budgets",
+    "category": "prototype_vs_productionize",
+    "position": "A_immediate"
+  },
+  {
+    "id": 545,
+    "question": "The clean energy startup's electrolyzer development reflects",
+    "immediate": "(B) constructing a lab-scale unit to measure efficiency at controlled conditions",
+    "long_term": "(A) engineering a commercially scalable stack with stack-degradation mitigation",
+    "category": "prototype_vs_productionize",
+    "position": "B_immediate"
+  },
+  {
+    "id": 546,
+    "question": "The social platform's content moderation feature reflects a stage of",
+    "immediate": "(A) flagging posts through a keyword blocklist to demonstrate baseline recall",
+    "long_term": "(B) deploying a multi-modal classifier with human review integration and appeals",
+    "category": "prototype_vs_productionize",
+    "position": "A_immediate"
+  },
+  {
+    "id": 547,
+    "question": "The precision agriculture startup's field monitoring system involves",
+    "immediate": "(B) deploying a handful of sensors in trial fields to observe data patterns",
+    "long_term": "(A) building a ruggedized sensor network with automated calibration and replacement logistics",
+    "category": "prototype_vs_productionize",
+    "position": "B_immediate"
+  },
+  {
+    "id": 548,
+    "question": "The insurance tech firm's underwriting model development focuses on",
+    "immediate": "(A) training a regression model on historic claims data to estimate loss ratios",
+    "long_term": "(B) embedding the model into a regulatory-approved underwriting decision system",
+    "category": "prototype_vs_productionize",
+    "position": "A_immediate"
+  },
+  {
+    "id": 549,
+    "question": "The building automation startup's controls system development involves",
+    "immediate": "(B) simulating HVAC optimization logic in a digital twin before field deployment",
+    "long_term": "(A) certifying the edge control software for commercial building code compliance",
+    "category": "prototype_vs_productionize",
+    "position": "B_immediate"
+  },
+  {
+    "id": 550,
+    "question": "The enterprise security team's threat detection feature reflects a phase of",
+    "immediate": "(A) writing regex-based detection rules to prove the investigative hypothesis",
+    "long_term": "(B) operationalizing behavioral analytics with tuned alert thresholds and playbooks",
+    "category": "prototype_vs_productionize",
+    "position": "A_immediate"
+  },
+  {
+    "id": 551,
+    "question": "The wastewater authority's pollution response centers on",
+    "immediate": "(A) treating discharge to reduce contaminant levels within regulatory limits",
+    "long_term": "(B) replacing industrial outfall systems with closed-loop water reuse infrastructure",
+    "category": "clean_vs_redesign",
+    "position": "A_immediate"
+  },
+  {
+    "id": 552,
+    "question": "The software team's technical debt strategy reflects a preference for",
+    "immediate": "(B) refactoring the messiest modules to reduce bug density in current releases",
+    "long_term": "(A) decomposing the monolith into bounded services with clean API contracts",
+    "category": "clean_vs_redesign",
+    "position": "B_immediate"
+  },
+  {
+    "id": 553,
+    "question": "The food processor's contamination response strategy involves",
+    "immediate": "(A) sterilizing affected production lines and resuming standard operations",
+    "long_term": "(B) redesigning facility airflow and surface materials to eliminate contamination pathways",
+    "category": "clean_vs_redesign",
+    "position": "A_immediate"
+  },
+  {
+    "id": 554,
+    "question": "The urban highway authority's air quality response emphasizes",
+    "immediate": "(B) installing air filtration barriers along the corridor to reduce residential exposure",
+    "long_term": "(A) rerouting freight traffic and redesigning the corridor for multimodal use",
+    "category": "clean_vs_redesign",
+    "position": "B_immediate"
+  },
+  {
+    "id": 555,
+    "question": "The chemical plant's spill response strategy centers on",
+    "immediate": "(A) deploying containment booms and sorbent materials around the release site",
+    "long_term": "(B) reengineering storage and transfer systems to eliminate overflow failure modes",
+    "category": "clean_vs_redesign",
+    "position": "A_immediate"
+  },
+  {
+    "id": 556,
+    "question": "The school district's academic integrity response involves",
+    "immediate": "(B) auditing submitted assignments with plagiarism detection software",
+    "long_term": "(A) redesigning assessment formats that make memorized-answer cheating ineffective",
+    "category": "clean_vs_redesign",
+    "position": "B_immediate"
+  },
+  {
+    "id": 557,
+    "question": "The hospital's infection control response strategy centers on",
+    "immediate": "(A) enforcing enhanced sanitation protocols following a nosocomial outbreak",
+    "long_term": "(B) redesigning patient room ventilation and material surfaces to reduce pathogen transmission",
+    "category": "clean_vs_redesign",
+    "position": "A_immediate"
+  },
+  {
+    "id": 558,
+    "question": "The financial regulator's market-manipulation response involves",
+    "immediate": "(B) fining the offending firm and requiring remediation of the specific conduct",
+    "long_term": "(A) restructuring market microstructure rules to remove incentives for manipulation",
+    "category": "clean_vs_redesign",
+    "position": "B_immediate"
+  },
+  {
+    "id": 559,
+    "question": "The power plant's emissions compliance strategy reflects",
+    "immediate": "(A) installing scrubbers on existing stacks to meet current particulate standards",
+    "long_term": "(B) replacing combustion-based generation with zero-emission renewable capacity",
+    "category": "clean_vs_redesign",
+    "position": "A_immediate"
+  },
+  {
+    "id": 560,
+    "question": "The municipality's graffiti response policy centers on",
+    "immediate": "(B) dispatching cleanup crews to repaint tagged surfaces within forty-eight hours",
+    "long_term": "(A) designing public spaces with materials and murals that deter unauthorized tagging",
+    "category": "clean_vs_redesign",
+    "position": "B_immediate"
+  },
+  {
+    "id": 561,
+    "question": "The data center's cooling-inefficiency response involves",
+    "immediate": "(A) adding supplemental air conditioning units to stabilize server temperatures",
+    "long_term": "(B) redesigning the hot-aisle containment and liquid cooling architecture",
+    "category": "clean_vs_redesign",
+    "position": "A_immediate"
+  },
+  {
+    "id": 562,
+    "question": "The insurance company's fraud response strategy emphasizes",
+    "immediate": "(B) investigating and recovering losses from the identified fraudulent claims",
+    "long_term": "(A) redesigning the claims intake process to block known fraud patterns upstream",
+    "category": "clean_vs_redesign",
+    "position": "B_immediate"
+  },
+  {
+    "id": 563,
+    "question": "The airline's maintenance-compliance response centers on",
+    "immediate": "(A) correcting the identified discrepancies in the aircraft maintenance records",
+    "long_term": "(B) redesigning documentation workflows to eliminate manual transcription errors",
+    "category": "clean_vs_redesign",
+    "position": "A_immediate"
+  },
+  {
+    "id": 564,
+    "question": "The public transit agency's accessibility response involves",
+    "immediate": "(B) retrofitting existing stations with ramps and tactile paving for compliance",
+    "long_term": "(A) incorporating universal design standards into every future station specification",
+    "category": "clean_vs_redesign",
+    "position": "B_immediate"
+  },
+  {
+    "id": 565,
+    "question": "The semiconductor fab's yield-loss response strategy reflects",
+    "immediate": "(A) identifying and scrapping defective wafers while adjusting process parameters",
+    "long_term": "(B) redesigning the deposition process to eliminate the defect mechanism at source",
+    "category": "clean_vs_redesign",
+    "position": "A_immediate"
+  },
+  {
+    "id": 566,
+    "question": "The university's research-misconduct response involves",
+    "immediate": "(B) retracting the identified papers and sanctioning the responsible researchers",
+    "long_term": "(A) redesigning research oversight structures to detect problems at the study stage",
+    "category": "clean_vs_redesign",
+    "position": "B_immediate"
+  },
+  {
+    "id": 567,
+    "question": "The shipping company's port-congestion response centers on",
+    "immediate": "(A) clearing current container backlogs by authorizing extended gate hours",
+    "long_term": "(B) redesigning berth scheduling and cargo-flow algorithms to prevent recurrence",
+    "category": "clean_vs_redesign",
+    "position": "A_immediate"
+  },
+  {
+    "id": 568,
+    "question": "The city's lead-pipe remediation approach involves",
+    "immediate": "(B) adding phosphate inhibitors to distribution water to reduce leaching",
+    "long_term": "(A) replacing all lead service lines with copper or HDPE alternatives",
+    "category": "clean_vs_redesign",
+    "position": "B_immediate"
+  },
+  {
+    "id": 569,
+    "question": "The social media platform's misinformation response strategy centers on",
+    "immediate": "(A) labeling and downranking false content identified by fact-checking partners",
+    "long_term": "(B) redesigning ranking algorithms to reduce virality incentives for sensational content",
+    "category": "clean_vs_redesign",
+    "position": "A_immediate"
+  },
+  {
+    "id": 570,
+    "question": "The manufacturing plant's ergonomic-injury response involves",
+    "immediate": "(B) providing physical therapy access to workers with repetitive strain injuries",
+    "long_term": "(A) redesigning workstation layouts and automation to eliminate the root ergonomic hazard",
+    "category": "clean_vs_redesign",
+    "position": "B_immediate"
+  },
+  {
+    "id": 571,
+    "question": "The pharmaceutical company's recall response strategy centers on",
+    "immediate": "(A) retrieving affected batches from distribution and notifying downstream customers",
+    "long_term": "(B) redesigning the manufacturing validation process to detect contamination earlier",
+    "category": "clean_vs_redesign",
+    "position": "A_immediate"
+  },
+  {
+    "id": 572,
+    "question": "The community college's dropout-prevention response involves",
+    "immediate": "(B) providing emergency financial aid to students who signal intent to withdraw",
+    "long_term": "(A) redesigning advising and scheduling to reduce the conditions driving withdrawal",
+    "category": "clean_vs_redesign",
+    "position": "B_immediate"
+  },
+  {
+    "id": 573,
+    "question": "The municipal stormwater system's overflow response centers on",
+    "immediate": "(A) pumping out flooded basements and clearing blocked drain inlets after events",
+    "long_term": "(B) separating combined sewer overflows through infrastructure decoupling projects",
+    "category": "clean_vs_redesign",
+    "position": "A_immediate"
+  },
+  {
+    "id": 574,
+    "question": "The tech company's security-breach response strategy reflects",
+    "immediate": "(B) rotating compromised credentials and patching the exploited vulnerability",
+    "long_term": "(A) adopting a zero-trust architecture that eliminates implicit network trust",
+    "category": "clean_vs_redesign",
+    "position": "B_immediate"
+  },
+  {
+    "id": 575,
+    "question": "The national park's invasive species response centers on",
+    "immediate": "(A) manually removing invasive plants from high-traffic visitor areas",
+    "long_term": "(B) restoring native plant communities that outcompete invasive species naturally",
+    "category": "clean_vs_redesign",
+    "position": "A_immediate"
+  },
+  {
+    "id": 576,
+    "question": "The sales team's quarterly rhythm prioritizes",
+    "immediate": "(A) closing deals in the pipeline to hit the revenue number this period",
+    "long_term": "(B) building relationships with prospects who represent multi-year contract value",
+    "category": "perform_vs_grow",
+    "position": "A_immediate"
+  },
+  {
+    "id": 577,
+    "question": "The athlete's training cycle reflects an emphasis on",
+    "immediate": "(B) peaking for the championship event at the end of this competitive season",
+    "long_term": "(A) developing movement mechanics and strength bases for a multi-year performance arc",
+    "category": "perform_vs_grow",
+    "position": "B_immediate"
+  },
+  {
+    "id": 578,
+    "question": "The management consulting firm's partner evaluation model emphasizes",
+    "immediate": "(A) billing utilization and client satisfaction scores from the current portfolio",
+    "long_term": "(B) investing in thought leadership and sector expertise that generates future demand",
+    "category": "perform_vs_grow",
+    "position": "A_immediate"
+  },
+  {
+    "id": 579,
+    "question": "The engineering team's sprint planning reflects a focus on",
+    "immediate": "(B) delivering the committed features on the roadmap within the cycle",
+    "long_term": "(A) investing in testing infrastructure and documentation that raises baseline velocity",
+    "category": "perform_vs_grow",
+    "position": "B_immediate"
+  },
+  {
+    "id": 580,
+    "question": "The school principal's faculty development strategy emphasizes",
+    "immediate": "(A) coaching teachers to improve scores on the upcoming standardized assessment",
+    "long_term": "(B) investing in instructional coaching that deepens pedagogical repertoire over time",
+    "category": "perform_vs_grow",
+    "position": "A_immediate"
+  },
+  {
+    "id": 581,
+    "question": "The restaurant group's kitchen management focus centers on",
+    "immediate": "(B) hitting food cost and table-turn targets across locations this month",
+    "long_term": "(A) training line cooks through systematic skill rotations to build culinary depth",
+    "category": "perform_vs_grow",
+    "position": "B_immediate"
+  },
+  {
+    "id": 582,
+    "question": "The research lab's grant allocation model reflects a preference for",
+    "immediate": "(A) funding projects that are closest to publishable results in the pipeline",
+    "long_term": "(B) supporting exploratory work that may define entirely new research directions",
+    "category": "perform_vs_grow",
+    "position": "A_immediate"
+  },
+  {
+    "id": 583,
+    "question": "The film production company's project selection approach involves",
+    "immediate": "(B) greenlighting scripts with proven genre formulas and strong presale demand",
+    "long_term": "(A) developing original IP that builds the studio's creative identity and catalog value",
+    "category": "perform_vs_grow",
+    "position": "B_immediate"
+  },
+  {
+    "id": 584,
+    "question": "The marketing department's budget allocation reflects a focus on",
+    "immediate": "(A) optimizing paid media spend for the lowest cost-per-acquisition this quarter",
+    "long_term": "(B) investing in brand equity that compounds audience trust across market cycles",
+    "category": "perform_vs_grow",
+    "position": "A_immediate"
+  },
+  {
+    "id": 585,
+    "question": "The venture-backed CEO's resource allocation reflects an emphasis on",
+    "immediate": "(B) hitting the ARR milestone required for the next financing round",
+    "long_term": "(A) building management depth that can operate the business through hypergrowth",
+    "category": "perform_vs_grow",
+    "position": "B_immediate"
+  },
+  {
+    "id": 586,
+    "question": "The professional services firm's staffing model emphasizes",
+    "immediate": "(A) maximizing billable hours across the current client engagement portfolio",
+    "long_term": "(B) rotating staff through diverse engagements to broaden their consulting capabilities",
+    "category": "perform_vs_grow",
+    "position": "A_immediate"
+  },
+  {
+    "id": 587,
+    "question": "The high school basketball coach's player development approach involves",
+    "immediate": "(B) selecting lineups optimized to win in the current conference standings",
+    "long_term": "(A) deliberately giving younger players high-leverage minutes to accelerate their development",
+    "category": "perform_vs_grow",
+    "position": "B_immediate"
+  },
+  {
+    "id": 588,
+    "question": "The publishing imprint's editorial strategy centers on",
+    "immediate": "(A) acquiring manuscripts that fit proven reader demand patterns in the market",
+    "long_term": "(B) cultivating debut authors whose voices will define the imprint's next chapter",
+    "category": "perform_vs_grow",
+    "position": "A_immediate"
+  },
+  {
+    "id": 589,
+    "question": "The biotech company's clinical portfolio prioritization involves",
+    "immediate": "(B) advancing the compound closest to approval through final trial stages",
+    "long_term": "(A) funding early discovery programs that replenish the development pipeline",
+    "category": "perform_vs_grow",
+    "position": "B_immediate"
+  },
+  {
+    "id": 590,
+    "question": "The government workforce agency's program focus centers on",
+    "immediate": "(A) placing unemployed workers into available job openings across the region",
+    "long_term": "(B) investing in reskilling programs that shift workers into higher-wage occupations",
+    "category": "perform_vs_grow",
+    "position": "A_immediate"
+  },
+  {
+    "id": 591,
+    "question": "The hedge fund's portfolio positioning reflects a preference for",
+    "immediate": "(B) concentrating in positions with catalysts within the current fiscal quarter",
+    "long_term": "(A) allocating to compounders whose value accrues through multi-cycle reinvestment",
+    "category": "perform_vs_grow",
+    "position": "B_immediate"
+  },
+  {
+    "id": 592,
+    "question": "The manufacturing plant's operator training program focuses on",
+    "immediate": "(A) certifying workers on the machines they will operate in the current production cycle",
+    "long_term": "(B) cross-training operators across systems to build flexible and redundant workforce capacity",
+    "category": "perform_vs_grow",
+    "position": "A_immediate"
+  },
+  {
+    "id": 593,
+    "question": "The software product manager's feature prioritization reflects",
+    "immediate": "(B) shipping high-impact features on the committed roadmap for the release",
+    "long_term": "(A) investing in developer experience improvements that compound team productivity",
+    "category": "perform_vs_grow",
+    "position": "B_immediate"
+  },
+  {
+    "id": 594,
+    "question": "The military branch's readiness assessment centers on",
+    "immediate": "(A) ensuring deployed units meet mission-ready standards for current threat environments",
+    "long_term": "(B) investing in doctrine and force structure for emerging operational domains",
+    "category": "perform_vs_grow",
+    "position": "A_immediate"
+  },
+  {
+    "id": 595,
+    "question": "The community orchestra's rehearsal strategy involves",
+    "immediate": "(B) drilling the specific program pieces the ensemble will perform at the concert",
+    "long_term": "(A) developing musicians through orchestral repertoire spanning styles and technical demands",
+    "category": "perform_vs_grow",
+    "position": "B_immediate"
+  },
+  {
+    "id": 596,
+    "question": "The nonprofit's impact measurement focus centers on",
+    "immediate": "(A) documenting outputs and case stories that satisfy current funder requirements",
+    "long_term": "(B) building organizational learning systems that improve program effectiveness over time",
+    "category": "perform_vs_grow",
+    "position": "A_immediate"
+  },
+  {
+    "id": 597,
+    "question": "The construction company's project management approach involves",
+    "immediate": "(B) optimizing schedules and resource allocation to deliver the active project on time",
+    "long_term": "(A) investing in project management methodology that reduces delivery risk across all bids",
+    "category": "perform_vs_grow",
+    "position": "B_immediate"
+  },
+  {
+    "id": 598,
+    "question": "The hospital system's physician development model centers on",
+    "immediate": "(A) ensuring clinical staff maintain the procedural volumes required for credentialing",
+    "long_term": "(B) supporting clinicians in developing subspecialty expertise that expands service capacity",
+    "category": "perform_vs_grow",
+    "position": "A_immediate"
+  },
+  {
+    "id": 599,
+    "question": "The esports organization's competitive strategy reflects",
+    "immediate": "(B) optimizing team composition and strategy around the current meta",
+    "long_term": "(A) developing individual player mechanics that transfer across metas and titles",
+    "category": "perform_vs_grow",
+    "position": "B_immediate"
+  },
+  {
+    "id": 600,
+    "question": "The regional development bank's lending program centers on",
+    "immediate": "(A) disbursing capital to viable projects that are ready for financing approval",
+    "long_term": "(B) investing in project preparation facilities that expand the pipeline of bankable deals",
+    "category": "perform_vs_grow",
+    "position": "A_immediate"
+  }
+]

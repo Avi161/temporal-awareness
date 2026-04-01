@@ -1,0 +1,802 @@
+[
+  {
+    "id": 101,
+    "question": "The startup's approach to market entry reflects",
+    "immediate": "(A) undercutting rivals on price to capture their existing customers",
+    "long_term": "(B) building an industry consortium that defines shared standards",
+    "category": "compete_vs_collaborate",
+    "position": "A_immediate"
+  },
+  {
+    "id": 102,
+    "question": "The pharmaceutical company's approach to drug development involves",
+    "immediate": "(B) racing to file patents before rivals reach the compound",
+    "long_term": "(A) co-funding research consortia to accelerate shared scientific progress",
+    "category": "compete_vs_collaborate",
+    "position": "B_immediate"
+  },
+  {
+    "id": 103,
+    "question": "The professional sports team's approach to talent reflects",
+    "immediate": "(A) poaching top performers from rival teams by outbidding them",
+    "long_term": "(B) developing a youth academy pipeline that elevates the sport",
+    "category": "compete_vs_collaborate",
+    "position": "A_immediate"
+  },
+  {
+    "id": 104,
+    "question": "The tech platform's strategy toward other apps in the ecosystem involves",
+    "immediate": "(B) blocking competing features from accessing the platform API",
+    "long_term": "(A) cultivating a developer ecosystem that expands the platform's value",
+    "category": "compete_vs_collaborate",
+    "position": "B_immediate"
+  },
+  {
+    "id": 105,
+    "question": "The investment bank's approach to mergers and acquisitions reflects",
+    "immediate": "(A) structuring deals that maximize client gains at rival expense",
+    "long_term": "(B) fostering sector consolidation that creates healthier industry dynamics",
+    "category": "compete_vs_collaborate",
+    "position": "A_immediate"
+  },
+  {
+    "id": 106,
+    "question": "The agricultural cooperative's stance toward neighboring producers involves",
+    "immediate": "(B) differentiating on price and yield to outcompete neighboring farms",
+    "long_term": "(A) pooling distribution infrastructure and negotiating as a unified bloc",
+    "category": "compete_vs_collaborate",
+    "position": "B_immediate"
+  },
+  {
+    "id": 107,
+    "question": "The university's approach to peer research institutions reflects",
+    "immediate": "(A) competing for top faculty by outbidding rival institutions",
+    "long_term": "(B) co-founding research centers no single campus could build",
+    "category": "compete_vs_collaborate",
+    "position": "A_immediate"
+  },
+  {
+    "id": 108,
+    "question": "The regional airline's approach to route expansion involves",
+    "immediate": "(B) filing routes in airports where rivals are most vulnerable",
+    "long_term": "(A) co-developing interline agreements that extend network reach jointly",
+    "category": "compete_vs_collaborate",
+    "position": "B_immediate"
+  },
+  {
+    "id": 109,
+    "question": "The publisher's approach to new author acquisition reflects",
+    "immediate": "(A) outbidding rival houses for agents' most commercially attractive manuscripts",
+    "long_term": "(B) co-investing with other publishers in author development programs",
+    "category": "compete_vs_collaborate",
+    "position": "A_immediate"
+  },
+  {
+    "id": 110,
+    "question": "The hospital network's approach to specialist recruitment involves",
+    "immediate": "(B) offering signing bonuses that pull physicians from competing systems",
+    "long_term": "(A) partnering with medical schools to grow the specialist pipeline",
+    "category": "compete_vs_collaborate",
+    "position": "B_immediate"
+  },
+  {
+    "id": 111,
+    "question": "The city's economic development strategy centers on",
+    "immediate": "(A) attracting businesses away from neighboring cities with tax incentives",
+    "long_term": "(B) coordinating with the metro region on shared infrastructure investment",
+    "category": "compete_vs_collaborate",
+    "position": "A_immediate"
+  },
+  {
+    "id": 112,
+    "question": "The software company's approach to open source communities involves",
+    "immediate": "(B) forking the open source project for a proprietary advantage",
+    "long_term": "(A) contributing upstream code to strengthen the shared foundation",
+    "category": "compete_vs_collaborate",
+    "position": "B_immediate"
+  },
+  {
+    "id": 113,
+    "question": "The fashion brand's approach to independent designers reflects",
+    "immediate": "(A) replicating emerging designers' aesthetics at mass-market scale",
+    "long_term": "(B) incubating independent designers under a shared brand umbrella",
+    "category": "compete_vs_collaborate",
+    "position": "A_immediate"
+  },
+  {
+    "id": 114,
+    "question": "The food and beverage company's approach to sustainability standards involves",
+    "immediate": "(B) differentiating on proprietary sustainability claims against rivals",
+    "long_term": "(A) co-authoring industry-wide standards that raise the baseline for all",
+    "category": "compete_vs_collaborate",
+    "position": "B_immediate"
+  },
+  {
+    "id": 115,
+    "question": "The defense contractor's approach to R&D investment reflects",
+    "immediate": "(A) filing patents that block rivals from adjacent technologies",
+    "long_term": "(B) participating in government-funded consortia advancing shared platforms",
+    "category": "compete_vs_collaborate",
+    "position": "A_immediate"
+  },
+  {
+    "id": 116,
+    "question": "The streaming platform's approach to content production involves",
+    "immediate": "(B) locking exclusive deals that prevent rivals from licensing content",
+    "long_term": "(A) co-producing international content that expands the global market",
+    "category": "compete_vs_collaborate",
+    "position": "B_immediate"
+  },
+  {
+    "id": 117,
+    "question": "The private equity firm's approach to portfolio company value creation reflects",
+    "immediate": "(A) pursuing market share gains at rivals' direct expense",
+    "long_term": "(B) investing in category-level platforms that grow the overall market",
+    "category": "compete_vs_collaborate",
+    "position": "A_immediate"
+  },
+  {
+    "id": 118,
+    "question": "The consulting firm's approach to sector expertise involves",
+    "immediate": "(B) guarding proprietary frameworks to prevent rivals from copying them",
+    "long_term": "(A) publishing thought leadership that expands demand across the field",
+    "category": "compete_vs_collaborate",
+    "position": "B_immediate"
+  },
+  {
+    "id": 119,
+    "question": "The biotech's approach to clinical trial data reflects",
+    "immediate": "(A) maintaining data exclusivity to protect the commercial advantage",
+    "long_term": "(B) sharing anonymized trial data to accelerate the science",
+    "category": "compete_vs_collaborate",
+    "position": "A_immediate"
+  },
+  {
+    "id": 120,
+    "question": "The logistics startup's approach to last-mile infrastructure involves",
+    "immediate": "(B) building proprietary delivery networks that lock out rival operators",
+    "long_term": "(A) developing shared infrastructure that reduces costs across the industry",
+    "category": "compete_vs_collaborate",
+    "position": "B_immediate"
+  },
+  {
+    "id": 121,
+    "question": "The charter school network's approach to enrollment reflects",
+    "immediate": "(A) marketing aggressively to draw students from neighboring district schools",
+    "long_term": "(B) partnering with district schools on shared professional development",
+    "category": "compete_vs_collaborate",
+    "position": "A_immediate"
+  },
+  {
+    "id": 122,
+    "question": "The real estate developer's approach to urban land acquisition involves",
+    "immediate": "(B) assembling parcels before rivals can bid up remaining lots",
+    "long_term": "(A) participating in city-coordinated mixed-use district planning processes",
+    "category": "compete_vs_collaborate",
+    "position": "B_immediate"
+  },
+  {
+    "id": 123,
+    "question": "The grocery chain's approach to local food sourcing reflects",
+    "immediate": "(A) negotiating exclusive supplier deals that lock out rival stores",
+    "long_term": "(B) developing regional food networks that benefit producers and retailers",
+    "category": "compete_vs_collaborate",
+    "position": "A_immediate"
+  },
+  {
+    "id": 124,
+    "question": "The telecommunications provider's approach to rural coverage involves",
+    "immediate": "(B) delaying rural buildout until rivals have invested first",
+    "long_term": "(A) co-investing in shared rural infrastructure with other carriers",
+    "category": "compete_vs_collaborate",
+    "position": "B_immediate"
+  },
+  {
+    "id": 125,
+    "question": "The trade association's approach to workforce standards reflects",
+    "immediate": "(A) advocating for rules that favor member firms over non-members",
+    "long_term": "(B) setting professional standards that elevate competence across the sector",
+    "category": "compete_vs_collaborate",
+    "position": "A_immediate"
+  },
+  {
+    "id": 126,
+    "question": "The product team's approach to the upcoming release centers on",
+    "immediate": "(A) shipping the requested feature within the agreed scope",
+    "long_term": "(B) building an abstraction layer that makes new features trivial",
+    "category": "ship_vs_platform",
+    "position": "A_immediate"
+  },
+  {
+    "id": 127,
+    "question": "The engineering org's investment philosophy involves",
+    "immediate": "(B) deploying minimal code to satisfy each user request",
+    "long_term": "(A) building composable services that support a portfolio of products",
+    "category": "ship_vs_platform",
+    "position": "B_immediate"
+  },
+  {
+    "id": 128,
+    "question": "The data team's infrastructure strategy centers on",
+    "immediate": "(A) building a pipeline that delivers the metrics stakeholders need",
+    "long_term": "(B) designing a self-serve analytics platform for the whole organization",
+    "category": "ship_vs_platform",
+    "position": "A_immediate"
+  },
+  {
+    "id": 129,
+    "question": "The enterprise software vendor's development roadmap reflects",
+    "immediate": "(B) customizing each client's instance to their exact specification",
+    "long_term": "(A) building configurable modules served from a shared codebase",
+    "category": "ship_vs_platform",
+    "position": "B_immediate"
+  },
+  {
+    "id": 130,
+    "question": "The mobile app team's architecture decisions center on",
+    "immediate": "(A) hardcoding flows that cover ninety percent of user behavior",
+    "long_term": "(B) designing a plugin system for extension without core rewrites",
+    "category": "ship_vs_platform",
+    "position": "A_immediate"
+  },
+  {
+    "id": 131,
+    "question": "The cloud vendor's product strategy reflects",
+    "immediate": "(B) releasing managed services for specific high-demand workloads",
+    "long_term": "(A) building foundational primitives that support any workload imaginable",
+    "category": "ship_vs_platform",
+    "position": "B_immediate"
+  },
+  {
+    "id": 132,
+    "question": "The content management team's tooling approach centers on",
+    "immediate": "(A) building a custom editor for the editorial team's workflow",
+    "long_term": "(B) developing a headless CMS any channel can adopt",
+    "category": "ship_vs_platform",
+    "position": "A_immediate"
+  },
+  {
+    "id": 133,
+    "question": "The payments company's technology strategy involves",
+    "immediate": "(B) optimizing checkout conversion for the flagship e-commerce product",
+    "long_term": "(A) building a payments infrastructure layer usable by any merchant",
+    "category": "ship_vs_platform",
+    "position": "B_immediate"
+  },
+  {
+    "id": 134,
+    "question": "The HR tech startup's product direction centers on",
+    "immediate": "(A) delivering automated onboarding workflows for enterprise clients",
+    "long_term": "(B) building a workforce platform integrating all HR lifecycle processes",
+    "category": "ship_vs_platform",
+    "position": "A_immediate"
+  },
+  {
+    "id": 135,
+    "question": "The media company's technology investment reflects",
+    "immediate": "(B) building CMS features journalists need for the campaign",
+    "long_term": "(A) developing a distribution platform that supports any content format",
+    "category": "ship_vs_platform",
+    "position": "B_immediate"
+  },
+  {
+    "id": 136,
+    "question": "The government's digital services approach centers on",
+    "immediate": "(A) digitizing the most-used citizen-facing forms and processes",
+    "long_term": "(B) building shared digital infrastructure usable across all agencies",
+    "category": "ship_vs_platform",
+    "position": "A_immediate"
+  },
+  {
+    "id": 137,
+    "question": "The fintech's engineering strategy involves",
+    "immediate": "(B) coding a bespoke integration for each financial institution partner",
+    "long_term": "(A) building a universal financial data API for any institution",
+    "category": "ship_vs_platform",
+    "position": "B_immediate"
+  },
+  {
+    "id": 138,
+    "question": "The marketplace startup's technical approach reflects",
+    "immediate": "(A) launching a curated vertical marketplace for one product category",
+    "long_term": "(B) designing infrastructure that can host any commerce vertical",
+    "category": "ship_vs_platform",
+    "position": "A_immediate"
+  },
+  {
+    "id": 139,
+    "question": "The semiconductor company's software investment involves",
+    "immediate": "(B) providing drivers and SDKs for the most popular applications",
+    "long_term": "(A) building a developer platform that enables any application",
+    "category": "ship_vs_platform",
+    "position": "B_immediate"
+  },
+  {
+    "id": 140,
+    "question": "The logistics startup's technology roadmap centers on",
+    "immediate": "(A) building route optimization for the company's own driver network",
+    "long_term": "(B) developing a logistics-as-a-service API for third-party operators",
+    "category": "ship_vs_platform",
+    "position": "A_immediate"
+  },
+  {
+    "id": 141,
+    "question": "The healthcare IT vendor's product strategy reflects",
+    "immediate": "(B) building an EHR module for the highest-volume clinical workflow",
+    "long_term": "(A) developing an interoperable health data platform across systems",
+    "category": "ship_vs_platform",
+    "position": "B_immediate"
+  },
+  {
+    "id": 142,
+    "question": "The edtech company's development priorities center on",
+    "immediate": "(A) building the video lecture and quiz experience for launch",
+    "long_term": "(B) creating a learning management platform any instructor can use",
+    "category": "ship_vs_platform",
+    "position": "A_immediate"
+  },
+  {
+    "id": 143,
+    "question": "The retail tech team's architecture decision involves",
+    "immediate": "(B) building a promotion engine for the upcoming seasonal campaign",
+    "long_term": "(A) designing a composable commerce layer deployable across all channels",
+    "category": "ship_vs_platform",
+    "position": "B_immediate"
+  },
+  {
+    "id": 144,
+    "question": "The AI startup's product direction centers on",
+    "immediate": "(A) fine-tuning a model for the highest-traction use case",
+    "long_term": "(B) building foundational model infrastructure usable across application domains",
+    "category": "ship_vs_platform",
+    "position": "A_immediate"
+  },
+  {
+    "id": 145,
+    "question": "The insurance tech company's development strategy involves",
+    "immediate": "(B) automating the claims process for the highest-volume product line",
+    "long_term": "(A) building a modular underwriting engine any insurer can configure",
+    "category": "ship_vs_platform",
+    "position": "B_immediate"
+  },
+  {
+    "id": 146,
+    "question": "The IoT company's engineering investment reflects",
+    "immediate": "(A) building device firmware for the initial product hardware revision",
+    "long_term": "(B) designing an edge computing platform supporting any sensor type",
+    "category": "ship_vs_platform",
+    "position": "A_immediate"
+  },
+  {
+    "id": 147,
+    "question": "The cybersecurity company's product approach involves",
+    "immediate": "(B) building a detection rule for the active threat signature",
+    "long_term": "(A) developing a threat intelligence platform with open contribution models",
+    "category": "ship_vs_platform",
+    "position": "B_immediate"
+  },
+  {
+    "id": 148,
+    "question": "The accounting software team's development priorities center on",
+    "immediate": "(A) adding the specific tax form that customers are requesting",
+    "long_term": "(B) building a tax engine that adapts to any jurisdiction",
+    "category": "ship_vs_platform",
+    "position": "A_immediate"
+  },
+  {
+    "id": 149,
+    "question": "The sports analytics company's technology investment involves",
+    "immediate": "(B) building the player performance model for the flagship sport",
+    "long_term": "(A) developing a sports data platform for any federation",
+    "category": "ship_vs_platform",
+    "position": "B_immediate"
+  },
+  {
+    "id": 150,
+    "question": "The real estate tech startup's engineering focus centers on",
+    "immediate": "(A) building the property search and listing experience for launch",
+    "long_term": "(B) designing property data infrastructure usable by any proptech product",
+    "category": "ship_vs_platform",
+    "position": "A_immediate"
+  },
+  {
+    "id": 151,
+    "question": "The product manager's approach to poor retention metrics reflects",
+    "immediate": "(A) adding a re-engagement notification to reduce the drop-off rate",
+    "long_term": "(B) diagnosing whether the core value proposition meets user needs",
+    "category": "symptom_vs_cause",
+    "position": "A_immediate"
+  },
+  {
+    "id": 152,
+    "question": "The operations team's response to escalating customer complaints involves",
+    "immediate": "(B) allocating more agents to clear the complaints backlog",
+    "long_term": "(A) mapping the customer journey to find where experience fails",
+    "category": "symptom_vs_cause",
+    "position": "B_immediate"
+  },
+  {
+    "id": 153,
+    "question": "The CFO's response to declining gross margins reflects",
+    "immediate": "(A) cutting discretionary expenses to restore the margin percentage",
+    "long_term": "(B) examining the pricing architecture and cost structure systematically",
+    "category": "symptom_vs_cause",
+    "position": "A_immediate"
+  },
+  {
+    "id": 154,
+    "question": "The clinical team's approach to a hospital with high readmission rates involves",
+    "immediate": "(B) scheduling follow-up calls to recently discharged patients",
+    "long_term": "(A) analyzing the patient population to find readmission drivers",
+    "category": "symptom_vs_cause",
+    "position": "B_immediate"
+  },
+  {
+    "id": 155,
+    "question": "The school principal's response to declining attendance rates reflects",
+    "immediate": "(A) sending reminder messages to families of habitually absent students",
+    "long_term": "(B) investigating barriers to attendance in the school community",
+    "category": "symptom_vs_cause",
+    "position": "A_immediate"
+  },
+  {
+    "id": 156,
+    "question": "The reliability engineer's response to recurring production incidents involves",
+    "immediate": "(B) writing runbooks so on-call engineers resolve incidents faster",
+    "long_term": "(A) conducting failure mode analysis to eliminate the incident class",
+    "category": "symptom_vs_cause",
+    "position": "B_immediate"
+  },
+  {
+    "id": 157,
+    "question": "The supply chain team's response to a delivery delay spike reflects",
+    "immediate": "(A) expediting shipments and communicating revised dates to customers",
+    "long_term": "(B) auditing supplier capacity and dual-sourcing critical components",
+    "category": "symptom_vs_cause",
+    "position": "A_immediate"
+  },
+  {
+    "id": 158,
+    "question": "The HR leader's response to high voluntary turnover involves",
+    "immediate": "(B) increasing retention bonuses for the highest-departure-rate roles",
+    "long_term": "(A) conducting stay interviews to understand what drives attrition",
+    "category": "symptom_vs_cause",
+    "position": "B_immediate"
+  },
+  {
+    "id": 159,
+    "question": "The city engineer's response to a spike in pothole complaints reflects",
+    "immediate": "(A) deploying repair crews to fill the most-reported potholes",
+    "long_term": "(B) analyzing pavement degradation patterns to prioritize structural resurfacing",
+    "category": "symptom_vs_cause",
+    "position": "A_immediate"
+  },
+  {
+    "id": 160,
+    "question": "The nonprofit's response to falling program participation involves",
+    "immediate": "(B) promoting the program more heavily through social media channels",
+    "long_term": "(A) interviewing former participants to understand why they disengaged",
+    "category": "symptom_vs_cause",
+    "position": "B_immediate"
+  },
+  {
+    "id": 161,
+    "question": "The security team's response to a surge in phishing incidents reflects",
+    "immediate": "(A) issuing a staff warning about the active phishing campaign",
+    "long_term": "(B) investigating the behavioral and technical conditions enabling the campaign",
+    "category": "symptom_vs_cause",
+    "position": "A_immediate"
+  },
+  {
+    "id": 162,
+    "question": "The coach's response to a team losing streaks involves",
+    "immediate": "(B) adjusting the game plan for the next opponent's tendencies",
+    "long_term": "(A) examining training methods and team dynamics for structural weaknesses",
+    "category": "symptom_vs_cause",
+    "position": "B_immediate"
+  },
+  {
+    "id": 163,
+    "question": "The public health agency's response to an opioid overdose cluster reflects",
+    "immediate": "(A) distributing naloxone kits to first responders in affected neighborhoods",
+    "long_term": "(B) tracing distribution networks and addressing prescribing practice failures",
+    "category": "symptom_vs_cause",
+    "position": "A_immediate"
+  },
+  {
+    "id": 164,
+    "question": "The software team's response to a rising bug count involves",
+    "immediate": "(B) triaging and resolving the open defect backlog by severity",
+    "long_term": "(A) examining engineering practices and code review processes for gaps",
+    "category": "symptom_vs_cause",
+    "position": "B_immediate"
+  },
+  {
+    "id": 165,
+    "question": "The manufacturer's response to elevated scrap rates reflects",
+    "immediate": "(A) tightening inspection criteria to catch defective units sooner",
+    "long_term": "(B) investigating process variables that correlate with defect occurrence",
+    "category": "symptom_vs_cause",
+    "position": "A_immediate"
+  },
+  {
+    "id": 166,
+    "question": "The media organization's response to falling subscriber numbers involves",
+    "immediate": "(B) running a promotional discount campaign to reduce churn",
+    "long_term": "(A) researching shifts in audience needs and content consumption habits",
+    "category": "symptom_vs_cause",
+    "position": "B_immediate"
+  },
+  {
+    "id": 167,
+    "question": "The environmental regulator's response to elevated river pollution levels reflects",
+    "immediate": "(A) ordering remediation of the most contaminated testing sites",
+    "long_term": "(B) tracing discharge sources and reforming industrial permitting standards",
+    "category": "symptom_vs_cause",
+    "position": "A_immediate"
+  },
+  {
+    "id": 168,
+    "question": "The warehouse manager's response to picking accuracy errors involves",
+    "immediate": "(B) requiring double-checking of all orders during the next quarter",
+    "long_term": "(A) analyzing error patterns to redesign bin locations and labeling",
+    "category": "symptom_vs_cause",
+    "position": "B_immediate"
+  },
+  {
+    "id": 169,
+    "question": "The IT help desk's response to an influx of password reset requests reflects",
+    "immediate": "(A) processing each reset ticket and clearing the queue",
+    "long_term": "(B) examining whether single sign-on adoption would eliminate the category",
+    "category": "symptom_vs_cause",
+    "position": "A_immediate"
+  },
+  {
+    "id": 170,
+    "question": "The financial advisor's response to a client portfolio underperforming reflects",
+    "immediate": "(B) rebalancing the portfolio toward assets with stronger recent performance",
+    "long_term": "(A) reviewing the investment thesis against the client's risk profile",
+    "category": "symptom_vs_cause",
+    "position": "B_immediate"
+  },
+  {
+    "id": 171,
+    "question": "The agricultural researcher's response to yield declines in a crop district reflects",
+    "immediate": "(A) recommending fertilizer application adjustments for the affected fields",
+    "long_term": "(B) studying soil biology and climate variables for structural answers",
+    "category": "symptom_vs_cause",
+    "position": "A_immediate"
+  },
+  {
+    "id": 172,
+    "question": "The call center manager's response to long hold times involves",
+    "immediate": "(B) adding agents to the highest-volume shift",
+    "long_term": "(A) analyzing call drivers to eliminate avoidable contact reasons",
+    "category": "symptom_vs_cause",
+    "position": "B_immediate"
+  },
+  {
+    "id": 173,
+    "question": "The policy analyst's response to rising homelessness figures reflects",
+    "immediate": "(A) identifying shelter bed capacity gaps and funding additional units",
+    "long_term": "(B) examining the housing affordability and eviction dynamics driving inflow",
+    "category": "symptom_vs_cause",
+    "position": "A_immediate"
+  },
+  {
+    "id": 174,
+    "question": "The QA lead's response to customer-reported defects involves",
+    "immediate": "(B) triaging and patching the defects appearing in support tickets",
+    "long_term": "(A) examining the testing strategy that lets defects reach production",
+    "category": "symptom_vs_cause",
+    "position": "B_immediate"
+  },
+  {
+    "id": 175,
+    "question": "The marine biologist's response to coral bleaching events reflects",
+    "immediate": "(A) deploying coral restoration nurseries in the most affected zones",
+    "long_term": "(B) investigating the oceanographic conditions driving bleaching frequency",
+    "category": "symptom_vs_cause",
+    "position": "A_immediate"
+  },
+  {
+    "id": 176,
+    "question": "The corporate trainer's design approach to new employee orientation reflects",
+    "immediate": "(A) covering policies, tools, and procedures for the assigned role",
+    "long_term": "(B) developing judgment and professional identity across the full career",
+    "category": "teach_vs_mentor",
+    "position": "A_immediate"
+  },
+  {
+    "id": 177,
+    "question": "The senior engineer's approach to guiding junior developers involves",
+    "immediate": "(B) explaining how to implement the specific task at hand",
+    "long_term": "(A) shaping how they think about software design trade-offs",
+    "category": "teach_vs_mentor",
+    "position": "B_immediate"
+  },
+  {
+    "id": 178,
+    "question": "The professor's approach to graduate student advising centers on",
+    "immediate": "(A) providing feedback on the dissertation chapter currently under review",
+    "long_term": "(B) cultivating a scholarly identity and professional network throughout",
+    "category": "teach_vs_mentor",
+    "position": "A_immediate"
+  },
+  {
+    "id": 179,
+    "question": "The executive's approach to sponsoring high-potential employees involves",
+    "immediate": "(B) briefing them on the skills needed for the role",
+    "long_term": "(A) advocating for stretch assignments that develop leadership breadth",
+    "category": "teach_vs_mentor",
+    "position": "B_immediate"
+  },
+  {
+    "id": 180,
+    "question": "The medical residency director's approach to resident development reflects",
+    "immediate": "(A) ensuring competency on the clinical procedures required for graduation",
+    "long_term": "(B) cultivating the clinical reasoning and judgment of a physician",
+    "category": "teach_vs_mentor",
+    "position": "A_immediate"
+  },
+  {
+    "id": 181,
+    "question": "The nonprofit leader's approach to developing field staff involves",
+    "immediate": "(B) training staff on program delivery standards and reporting requirements",
+    "long_term": "(A) nurturing their vision and capacity for adaptive field leadership",
+    "category": "teach_vs_mentor",
+    "position": "B_immediate"
+  },
+  {
+    "id": 182,
+    "question": "The law firm's associate development approach centers on",
+    "immediate": "(A) providing feedback on the motion or document under review",
+    "long_term": "(B) developing the associate's judgment and client relationship capabilities",
+    "category": "teach_vs_mentor",
+    "position": "A_immediate"
+  },
+  {
+    "id": 183,
+    "question": "The athletic coach's approach to player development involves",
+    "immediate": "(B) correcting technique errors visible in the practice session footage",
+    "long_term": "(A) shaping the athlete's competitive mindset and self-coaching capabilities",
+    "category": "teach_vs_mentor",
+    "position": "B_immediate"
+  },
+  {
+    "id": 184,
+    "question": "The school principal's approach to supporting new teachers centers on",
+    "immediate": "(A) providing feedback on lesson plans and classroom management observations",
+    "long_term": "(B) fostering a professional identity rooted in inquiry and growth",
+    "category": "teach_vs_mentor",
+    "position": "A_immediate"
+  },
+  {
+    "id": 185,
+    "question": "The venture capitalist's approach to portfolio founder support involves",
+    "immediate": "(B) advising on the go-to-market strategy for the fundraising round",
+    "long_term": "(A) developing the founder's capacity to lead through growth stages",
+    "category": "teach_vs_mentor",
+    "position": "B_immediate"
+  },
+  {
+    "id": 186,
+    "question": "The military commander's approach to developing junior officers reflects",
+    "immediate": "(A) building tactical proficiency required for current mission sets",
+    "long_term": "(B) cultivating strategic thinking and command presence over a career",
+    "category": "teach_vs_mentor",
+    "position": "A_immediate"
+  },
+  {
+    "id": 187,
+    "question": "The master craftsperson's approach to apprentice development involves",
+    "immediate": "(B) demonstrating technique on the specific joint being made",
+    "long_term": "(A) transmitting the aesthetic sensibility and problem-solving ethos",
+    "category": "teach_vs_mentor",
+    "position": "B_immediate"
+  },
+  {
+    "id": 188,
+    "question": "The academic department's approach to early-career faculty support centers on",
+    "immediate": "(A) providing guidance on teaching evaluations and the tenure file",
+    "long_term": "(B) nurturing a distinctive scholarly voice and intellectual contribution",
+    "category": "teach_vs_mentor",
+    "position": "A_immediate"
+  },
+  {
+    "id": 189,
+    "question": "The product leader's approach to developing product managers involves",
+    "immediate": "(B) reviewing their product requirement documents and roadmap presentations",
+    "long_term": "(A) helping them develop customer empathy and strategic product intuition",
+    "category": "teach_vs_mentor",
+    "position": "B_immediate"
+  },
+  {
+    "id": 190,
+    "question": "The therapist's approach to clinical supervision of trainees reflects",
+    "immediate": "(A) reviewing case notes and guiding intervention choices for clients",
+    "long_term": "(B) developing the trainee's self-awareness and therapeutic style over time",
+    "category": "teach_vs_mentor",
+    "position": "A_immediate"
+  },
+  {
+    "id": 191,
+    "question": "The journalism professor's approach to student reporters involves",
+    "immediate": "(B) editing the story the student is filing for publication",
+    "long_term": "(A) cultivating editorial judgment and ethical reasoning across story types",
+    "category": "teach_vs_mentor",
+    "position": "B_immediate"
+  },
+  {
+    "id": 192,
+    "question": "The architect's approach to developing junior designers centers on",
+    "immediate": "(A) reviewing construction documents for the project in progress",
+    "long_term": "(B) nurturing spatial intuition and a distinctive design philosophy",
+    "category": "teach_vs_mentor",
+    "position": "A_immediate"
+  },
+  {
+    "id": 193,
+    "question": "The policy director's approach to developing junior analysts involves",
+    "immediate": "(B) correcting the memo structure and sourcing in the document",
+    "long_term": "(A) developing their capacity to frame problems and influence stakeholders",
+    "category": "teach_vs_mentor",
+    "position": "B_immediate"
+  },
+  {
+    "id": 194,
+    "question": "The surgeon's approach to training residents in the operating room reflects",
+    "immediate": "(A) guiding technique on the procedure being performed",
+    "long_term": "(B) cultivating surgical judgment and ability to manage intraoperative uncertainty",
+    "category": "teach_vs_mentor",
+    "position": "A_immediate"
+  },
+  {
+    "id": 195,
+    "question": "The orchestra conductor's approach to section leader development involves",
+    "immediate": "(B) correcting intonation and ensemble balance in the current rehearsal",
+    "long_term": "(A) developing musical leadership and capacity to inspire section cohesion",
+    "category": "teach_vs_mentor",
+    "position": "B_immediate"
+  },
+  {
+    "id": 196,
+    "question": "The government agency's leadership development program centers on",
+    "immediate": "(A) certifying managers on regulations and procedures for their function",
+    "long_term": "(B) shaping leaders who navigate ambiguity and drive institutional change",
+    "category": "teach_vs_mentor",
+    "position": "A_immediate"
+  },
+  {
+    "id": 197,
+    "question": "The conservation organization's approach to developing field scientists involves",
+    "immediate": "(B) training them in data collection protocols for active surveys",
+    "long_term": "(A) cultivating ecological intuition and a conservation ethic",
+    "category": "teach_vs_mentor",
+    "position": "B_immediate"
+  },
+  {
+    "id": 198,
+    "question": "The startup CEO's approach to developing the leadership team centers on",
+    "immediate": "(A) aligning each leader on the goals for the cycle",
+    "long_term": "(B) developing each leader toward their full executive potential",
+    "category": "teach_vs_mentor",
+    "position": "A_immediate"
+  },
+  {
+    "id": 199,
+    "question": "The community college's approach to student advising involves",
+    "immediate": "(B) guiding students toward courses that fulfill their degree plan",
+    "long_term": "(A) helping students articulate career aspirations and map pathways",
+    "category": "teach_vs_mentor",
+    "position": "B_immediate"
+  },
+  {
+    "id": 200,
+    "question": "The publishing editor's approach to developing debut authors centers on",
+    "immediate": "(A) providing line edits and structural feedback on the manuscript",
+    "long_term": "(B) nurturing a distinctive authorial voice across every book",
+    "category": "teach_vs_mentor",
+    "position": "A_immediate"
+  }
+]
